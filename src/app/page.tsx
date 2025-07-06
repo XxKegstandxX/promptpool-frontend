@@ -5,7 +5,15 @@ import { ethers } from 'ethers'
 
 // Import the floating particles component
 const FloatingParticles = () => {
-  const [particles, setParticles] = useState<any[]>([])
+  const [particles, setParticles] = useState<Array<{
+    id: number;
+    x: number;
+    y: number;
+    size: number;
+    speed: number;
+    opacity: number;
+    delay: number;
+  }>>([]);
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
@@ -84,7 +92,14 @@ export default function PromptPoolApp() {
   const [isConnected, setIsConnected] = useState(false)
   const [account, setAccount] = useState<string>('')
   const [contract, setContract] = useState<ethers.Contract | null>(null)
-  const [userStats, setUserStats] = useState<any>(null)
+  const [userStats, setUserStats] = useState<{
+    totalSubmissions: string;
+    approvedSubmissions: string;
+    totalRewards: string;
+    reputationScore: string;
+    currentTier: number;
+    consecutiveApprovals: string;
+  } | null>(null)
   const [totalSubmissions, setTotalSubmissions] = useState<string>('0')
   const [contractBalance, setContractBalance] = useState<string>('0')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -177,7 +192,7 @@ export default function PromptPoolApp() {
     if (contract && account && promptContent.length >= 20) {
       estimateReward()
     }
-  }, [promptContent, category, contract, account])
+  }, [promptContent, category, contract, account, estimateReward])
 
   // Submit prompt
   const submitPrompt = async () => {
@@ -344,7 +359,7 @@ export default function PromptPoolApp() {
                 <span className="text-3xl md:text-5xl">Through Crypto Rewards</span>
               </h2>
               <p className="text-xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
-                Submit high-quality prompts and earn POOL tokens instantly. No mining hardware needed - just your creativity and knowledge. Join the world's first "Proof of Contribution" ecosystem.
+                Submit high-quality prompts and earn POOL tokens instantly. No mining hardware needed - just your creativity and knowledge. Join the world&apos;s first &quot;Proof of Contribution&quot; ecosystem.
               </p>
               
               <button 
@@ -460,7 +475,7 @@ export default function PromptPoolApp() {
                 How PromptPool Works
               </h1>
               <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Learn how our revolutionary "Proof of Contribution" system rewards quality over computational power
+                Learn how our revolutionary &quot;Proof of Contribution&quot; system rewards quality over computational power
               </p>
             </div>
 
