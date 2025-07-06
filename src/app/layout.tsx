@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Web3Provider from "../lib/Web3Provider";
+import { ToastProvider } from '../components/Toast'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -11,11 +13,6 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
-export const metadata: Metadata = {
-  title: 'PromptPool - Rewarding AI Innovation',
-  description: 'Earn crypto rewards for contributing high-quality prompts to AI training databases. Join the world\'s first "Proof of Contribution" ecosystem.',
-};
 
 export default function RootLayout({
   children,
@@ -30,7 +27,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Web3Provider>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </Web3Provider>
       </body>
     </html>
   );
