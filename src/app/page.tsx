@@ -342,7 +342,7 @@ export default function PromptPoolApp() {
         setPromptContent('')
       }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error submitting prompt:', error)
       
       // Remove any loading toasts
@@ -353,7 +353,7 @@ export default function PromptPoolApp() {
       addToast({
         type: 'error',
         title: 'Submission Failed',
-        message: error.message || 'Unknown error occurred'
+        message: error instanceof Error ? error.message : 'Unknown error occurred'
       })
     }
   }
@@ -426,9 +426,9 @@ export default function PromptPoolApp() {
       <header className="relative z-50 border-b border-teal-500/20 bg-black/50 backdrop-blur-lg sticky top-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo */}
+            {/* FIXED: Logo with flex-shrink-0 and responsive sizing */}
             <div 
-              className="flex items-center space-x-2 cursor-pointer"
+              cclassName="flex items-center space-x-2 cursor-pointer flex-shrink-0"
               onClick={() => setCurrentPage('home')}
             >
               <div className="text-2xl animate-pulse">💧</div>
@@ -471,38 +471,41 @@ export default function PromptPoolApp() {
               </button>
             </nav>
             
-            {/* Enhanced Wallet Connection */}
-            <div className="flex items-center space-x-4">
-              {/* Legacy ethers connection */}
-              {!isConnected ? (
-                <button
-                  onClick={connectWallet}
-                  className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-semibold py-2 px-6 rounded-full transition-all duration-200 transform hover:scale-105 shadow-lg"
-                >
-                  Connect Wallet
-                </button>
-              ) : (
-                <div className="flex items-center space-x-3">
-                  <div className="text-sm text-teal-400 font-mono">
-                    {account.slice(0, 6)}...{account.slice(-4)}
-                  </div>
-                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                </div>
-              )}
-              
-              {/* Enhanced wagmi connection */}
-              <WagmiConnectButton />
-              
-              {/* Mobile menu button */}
-              <button 
-                className="md:hidden text-white"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
-                </svg>
-              </button>
-            </div>
+            {/* FIXED: Enhanced Wallet Connection - Better Mobile Layout */}
+<div className="flex items-center space-x-2 lg:space-x-4">
+  {/* Desktop/Tablet Wallet Buttons - Better Spacing */}
+  <div className="hidden sm:flex items-center space-x-2">
+    {/* Legacy ethers connection */}
+    {!isConnected ? (
+      <button
+        onClick={connectWallet}
+        className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-semibold py-2 px-4 lg:px-6 rounded-full transition-all duration-200 transform hover:scale-105 shadow-lg text-xs lg:text-sm"
+      >
+        Connect Wallet
+      </button>
+    ) : (
+      <div className="flex items-center space-x-2">
+        <div className="text-xs lg:text-sm text-teal-400 font-mono">
+          {account.slice(0, 4)}...{account.slice(-4)}
+        </div>
+        <div className="w-2 h-2 lg:w-3 lg:h-3 bg-green-400 rounded-full animate-pulse"></div>
+      </div>
+    )}
+    
+    {/* Enhanced wagmi connection */}
+    <WagmiConnectButton />
+  </div>
+  
+  {/* Mobile menu button */}
+  <button 
+    className="md:hidden text-white p-2"
+    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+  >
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+    </svg>
+  </button>
+</div>
           </div>
           
           {/* Mobile Navigation */}
