@@ -13,68 +13,60 @@ interface IPFSResponse {
   url: string
 }
 
+interface APIResponse {
+  success?: boolean
+  hash?: string
+  url?: string
+  error?: string
+  message?: string
+  isDemo?: boolean
+}
+
 class IPFSService {
-  private jwtToken: string
   private baseUrl: string
 
   constructor() {
-    // Using Pinata JWT authentication (modern approach)
-    this.jwtToken = process.env.NEXT_PUBLIC_PINATA_JWT || ''
-    this.baseUrl = 'https://api.pinata.cloud'
+    this.baseUrl = '/api/upload-to-ipfs'
   }
 
-  // Upload prompt data to IPFS
+  // Upload prompt data to IPFS via secure API route
   async uploadPrompt(promptData: PromptData): Promise<IPFSResponse> {
     try {
-      // Create a structured prompt object
-      const promptObject = {
-        ...promptData,
-        version: '1.0',
-        platform: 'PromptPool',
-        timestamp: Date.now()
-      }
-
-      // Check if we have JWT token for production
-      if (!this.jwtToken) {
-        console.log('🔶 IPFS Demo Mode: No JWT token found, using simulation')
-        return this.simulateIPFSUpload(promptObject)
-      }
-
-      console.log('🚀 IPFS Production Mode: Uploading to Pinata...')
+      console.log('🚀 IPFS: Uploading via secure API...')
       
-      const response = await fetch(`${this.baseUrl}/pinning/pinJSONToIPFS`, {
+      const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.jwtToken}`,
         },
-        body: JSON.stringify({
-          pinataContent: promptObject,
-          pinataMetadata: {
-            name: `PromptPool-${promptData.title.replace(/[^a-zA-Z0-9]/g, '-')}`,
-            keyvalues: {
-              category: promptData.category.toString(),
-              author: promptData.author,
-              platform: 'PromptPool',
-              type: 'ai-prompt'
-            }
-          }
-        })
+        body: JSON.stringify(promptData)
       })
 
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error('Pinata API Error:', errorText)
-        throw new Error(`IPFS upload failed: ${response.status} ${response.statusText}`)
+      const result: APIResponse = await response.json()
+
+      // Handle demo mode response
+      if (result.isDemo || result.error?.includes('not configured')) {
+        console.log('🔶 IPFS Demo Mode: Using simulation')
+        return this.simulateIPFSUpload(promptData)
       }
 
-      const result = await response.json()
-      console.log('✅ IPFS Upload Success:', result.IpfsHash)
-      
-      return {
-        hash: result.IpfsHash,
-        url: `https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`
+      // Handle successful upload
+      if (result.success && result.hash && result.url) {
+        console.log('✅ IPFS Upload Success:', result.hash)
+        return {
+          hash: result.hash,
+          url: result.url
+        }
       }
+
+      // Handle API errors
+      if (result.error) {
+        console.error('IPFS API Error:', result.error, result.message)
+        throw new Error(result.message || result.error)
+      }
+
+      throw new Error('Unexpected API response format')
+
     } catch (error) {
       console.error('IPFS upload error:', error)
       
@@ -88,7 +80,7 @@ class IPFSService {
   async getPrompt(ipfsHash: string): Promise<PromptData | null> {
     try {
       // For demo mode, try localStorage first
-      if (!this.jwtToken && typeof window !== 'undefined') {
+      if (typeof window !== 'undefined') {
         const stored = localStorage.getItem(`ipfs-${ipfsHash}`)
         if (stored) {
           return JSON.parse(stored)
@@ -162,8 +154,18 @@ class IPFSService {
   }
 
   // Check if we're in production mode
-  isProductionMode(): boolean {
-    return !!this.jwtToken
+  async isProductionMode(): Promise<boolean> {
+    try {
+      const response = await fetch('/api/upload-to-ipfs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: 'test', content: 'test', category: 0, submittedAt: Date.now(), author: 'test' })
+      })
+      const result = await response.json()
+      return !result.isDemo
+    } catch {
+      return false
+    }
   }
 }
 
@@ -196,8 +198,7 @@ export async function getPromptFromIPFS(ipfsHash: string): Promise<PromptData | 
 // Environment setup helper
 export function getIPFSConfig() {
   return {
-    hasJWT: !!process.env.NEXT_PUBLIC_PINATA_JWT,
-    isDemo: !process.env.NEXT_PUBLIC_PINATA_JWT,
-    isProduction: !!process.env.NEXT_PUBLIC_PINATA_JWT
+    isSecure: true, // Now using secure API route
+    description: 'Using secure server-side IPFS integration'
   }
 }
