@@ -833,7 +833,37 @@ const disconnectWallet = async () => {
                 Start earning POOL tokens by contributing valuable prompts with IPFS storage and instant blockchain rewards
               </p>
             </div>
-
+        {/* POL Gas Faucet Callout */}
+<div className="mb-12">
+  <div className="bg-gradient-to-r from-teal-500/10 via-cyan-400/10 to-blue-500/10 border border-teal-400/30 rounded-xl p-6 backdrop-blur-sm">
+    <div className="flex items-center justify-center space-x-3 mb-4">
+      <div className="text-3xl">⛽</div>
+      <h3 className="text-xl font-bold text-teal-400">Need Gas for Transactions?</h3>
+    </div>
+    <p className="text-center text-gray-300 mb-4">
+      New to Polygon? Get free POL tokens for gas fees and start your PromptPool journey immediately!
+    </p>
+    <div className="flex justify-center">
+      <a
+        href="https://faucet.polygon.technology/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-semibold py-3 px-6 rounded-full transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center space-x-2"
+      >
+        <span>🚰</span>
+        <span>Get Free POL Tokens</span>
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+        </svg>
+      </a>
+    </div>
+    <div className="mt-4 text-center">
+      <p className="text-sm text-gray-400">
+        💡 <strong>Tip:</strong> You only need a small amount (~$0.01) for multiple transactions on Polygon!
+      </p>
+    </div>
+  </div>
+</div>
             {!displayIsConnected ? (
               <div className="text-center py-16">
                 <div className="text-6xl mb-6">🔗</div>
