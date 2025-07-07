@@ -14,14 +14,12 @@ interface IPFSResponse {
 }
 
 class IPFSService {
-  private apiKey: string
-  private apiSecret: string
+  private jwtToken: string
   private baseUrl: string
 
   constructor() {
-    // Using Pinata for IPFS (you'll need to get API keys)
-    this.apiKey = process.env.NEXT_PUBLIC_PINATA_API_KEY || ''
-    this.apiSecret = process.env.NEXT_PUBLIC_PINATA_SECRET_KEY || ''
+    // Using Pinata JWT authentication (modern approach)
+    this.jwtToken = process.env.NEXT_PUBLIC_PINATA_JWT || ''
     this.baseUrl = 'https://api.pinata.cloud'
   }
 
@@ -36,37 +34,42 @@ class IPFSService {
         timestamp: Date.now()
       }
 
-      // For demo purposes, we'll simulate IPFS upload
-      // In production, you'd use real Pinata API
-      if (!this.apiKey || !this.apiSecret) {
+      // Check if we have JWT token for production
+      if (!this.jwtToken) {
+        console.log('🔶 IPFS Demo Mode: No JWT token found, using simulation')
         return this.simulateIPFSUpload(promptObject)
       }
 
+      console.log('🚀 IPFS Production Mode: Uploading to Pinata...')
+      
       const response = await fetch(`${this.baseUrl}/pinning/pinJSONToIPFS`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'pinata_api_key': this.apiKey,
-          'pinata_secret_api_key': this.apiSecret,
+          'Authorization': `Bearer ${this.jwtToken}`,
         },
         body: JSON.stringify({
           pinataContent: promptObject,
           pinataMetadata: {
-            name: `PromptPool-${promptData.title}`,
+            name: `PromptPool-${promptData.title.replace(/[^a-zA-Z0-9]/g, '-')}`,
             keyvalues: {
               category: promptData.category.toString(),
               author: promptData.author,
-              platform: 'PromptPool'
+              platform: 'PromptPool',
+              type: 'ai-prompt'
             }
           }
         })
       })
 
       if (!response.ok) {
-        throw new Error(`IPFS upload failed: ${response.statusText}`)
+        const errorText = await response.text()
+        console.error('Pinata API Error:', errorText)
+        throw new Error(`IPFS upload failed: ${response.status} ${response.statusText}`)
       }
 
       const result = await response.json()
+      console.log('✅ IPFS Upload Success:', result.IpfsHash)
       
       return {
         hash: result.IpfsHash,
@@ -76,6 +79,7 @@ class IPFSService {
       console.error('IPFS upload error:', error)
       
       // Fallback to simulation if API fails
+      console.log('🔄 Falling back to demo mode due to error')
       return this.simulateIPFSUpload(promptData)
     }
   }
@@ -83,6 +87,14 @@ class IPFSService {
   // Retrieve prompt data from IPFS
   async getPrompt(ipfsHash: string): Promise<PromptData | null> {
     try {
+      // For demo mode, try localStorage first
+      if (!this.jwtToken && typeof window !== 'undefined') {
+        const stored = localStorage.getItem(`ipfs-${ipfsHash}`)
+        if (stored) {
+          return JSON.parse(stored)
+        }
+      }
+
       // Try multiple IPFS gateways for reliability
       const gateways = [
         `https://gateway.pinata.cloud/ipfs/${ipfsHash}`,
@@ -148,6 +160,11 @@ class IPFSService {
     // This would be implemented with real upload progress tracking
     return Math.random() * 100
   }
+
+  // Check if we're in production mode
+  isProductionMode(): boolean {
+    return !!this.jwtToken
+  }
 }
 
 // Export singleton instance
@@ -179,7 +196,8 @@ export async function getPromptFromIPFS(ipfsHash: string): Promise<PromptData | 
 // Environment setup helper
 export function getIPFSConfig() {
   return {
-    hasApiKeys: !!(process.env.NEXT_PUBLIC_PINATA_API_KEY && process.env.NEXT_PUBLIC_PINATA_SECRET_KEY),
-    isDemo: !(process.env.NEXT_PUBLIC_PINATA_API_KEY && process.env.NEXT_PUBLIC_PINATA_SECRET_KEY)
+    hasJWT: !!process.env.NEXT_PUBLIC_PINATA_JWT,
+    isDemo: !process.env.NEXT_PUBLIC_PINATA_JWT,
+    isProduction: !!process.env.NEXT_PUBLIC_PINATA_JWT
   }
 }

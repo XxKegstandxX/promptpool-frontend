@@ -227,7 +227,33 @@ export default function PromptPoolApp() {
       })
     }
   }
-
+// Legacy ethers disconnect function
+const disconnectWallet = async () => {
+  try {
+    // Clear the account state
+    setAccount('')
+    setIsConnected(false)
+    
+    // Clear any stored connection data
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('walletconnect')
+      localStorage.removeItem('WEB3_CONNECT_CACHED_PROVIDER')
+    }
+    
+    addToast({
+      type: 'success',
+      title: 'Wallet Disconnected',
+      message: 'Your wallet has been disconnected successfully'
+    })
+  } catch (error: unknown) {
+    console.error('Error disconnecting wallet:', error)
+    addToast({
+      type: 'error',
+      title: 'Disconnect Failed',
+      message: error instanceof Error ? error.message : 'Failed to disconnect wallet'
+    })
+  }
+}
   // Legacy user data loading (keeping for ethers fallback)
   const loadUserData = async (contractInstance: ethers.Contract, address: string) => {
     try {
@@ -505,6 +531,12 @@ export default function PromptPoolApp() {
           {account.slice(0, 4)}...{account.slice(-4)}
         </div>
         <div className="w-2 h-2 lg:w-3 lg:h-3 bg-green-400 rounded-full animate-pulse"></div>
+        <button
+          onClick={disconnectWallet}
+          className="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-full transition-all duration-200"
+        >
+          Disconnect
+          </button>  
       </div>
     )}
     
