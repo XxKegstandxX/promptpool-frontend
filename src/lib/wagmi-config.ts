@@ -2,6 +2,7 @@
 import { defaultWagmiConfig } from '@web3modal/wagmi/react/config'
 import { cookieStorage, createStorage } from 'wagmi'
 import { polygon, polygonAmoy } from 'wagmi/chains'
+import { walletConnect, injected, coinbaseWallet } from 'wagmi/connectors'
 
 // Get projectId from https://cloud.walletconnect.com
 export const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'your-project-id'
@@ -28,6 +29,17 @@ export const config = defaultWagmiConfig({
   enableWalletConnect: true, // Optional - true by default
   enableInjected: true, // Optional - true by default
   enableCoinbase: true, // Optional - true by default
+  enableEmail: true,
+  enableSocials: ['google', 'discord'],
+  connectors: [
+    injected(),
+    walletConnect({ projectId }),
+    coinbaseWallet({
+        appName: 'PromptPool',
+        appLogoUrl: 'https://promptpool.app/icon.png'
+    })
+]      
+
 })
 
 // Your contract configuration

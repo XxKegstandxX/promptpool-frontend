@@ -164,6 +164,22 @@ export default function PromptPoolApp() {
 
   // Legacy ethers wallet connection (keeping as fallback)
   const connectWallet = async () => {
+    // Mobile check - if on mobile, try to open MetaMask app directly
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+
+    if (isMobile && typeof window.ethereum === 'undefined') {
+      // Try to open MetaMask mobile app
+      const metamaskAppDeepLink = `https://metamask.app.link/dapp/${window.location.href}`
+      window.open(metamaskAppDeepLink, '_blank')
+
+      addToast({
+        type: 'info',
+        title: 'Opening MetaMask App',
+        message: 'If MetaMask doesn\'t open automatically, please open the MetaMask app and navigate to Browser tab'
+      })
+      return
+    }
+
     if (typeof window.ethereum !== 'undefined') {
       try {
         const provider = new ethers.BrowserProvider(window.ethereum)
@@ -428,7 +444,7 @@ export default function PromptPoolApp() {
           <div className="flex justify-between items-center h-16">
             {/* FIXED: Logo with flex-shrink-0 and responsive sizing */}
             <div 
-              cclassName="flex items-center space-x-2 cursor-pointer flex-shrink-0"
+              className="flex items-center space-x-2 cursor-pointer flex-shrink-0"
               onClick={() => setCurrentPage('home')}
             >
               <div className="text-2xl animate-pulse">💧</div>
