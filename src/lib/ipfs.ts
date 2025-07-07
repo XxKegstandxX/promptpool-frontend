@@ -125,7 +125,7 @@ class IPFSService {
   }
 
   // Simulate IPFS upload for demo/development
-  private async simulateIPFSUpload(promptData: any): Promise<IPFSResponse> {
+  private async simulateIPFSUpload(promptData: PromptData): Promise<IPFSResponse> {
     // Generate a realistic looking IPFS hash
     const hash = `Qm${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`
     

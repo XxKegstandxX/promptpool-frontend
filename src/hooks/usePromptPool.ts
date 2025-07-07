@@ -2,7 +2,7 @@
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useBalance } from 'wagmi'
 import { CONTRACT_CONFIG } from '../lib/wagmi-config'
 import { useState, useEffect } from 'react'
-import { formatEther, parseEther } from 'viem'
+import { formatEther } from 'viem'
 
 // Hook for reading user stats
 export function useUserStats(address?: `0x${string}`) {
@@ -104,7 +104,6 @@ export function useRewardEstimate(
 // Hook for submitting prompts
 export function useSubmitPrompt() {
   const { writeContract, data: hash, isPending, error } = useWriteContract()
-  const [isSubmitting, setIsSubmitting] = useState(false)
   
   const { isLoading: isConfirming, isSuccess, error: txError } = useWaitForTransactionReceipt({
     hash,
@@ -117,24 +116,15 @@ export function useSubmitPrompt() {
     promptLength: number
   ) => {
     try {
-      setIsSubmitting(true)
       await writeContract({
         ...CONTRACT_CONFIG,
         functionName: 'submitPrompt',
         args: [ipfsHash, title, category, BigInt(promptLength)]
       })
     } catch (error) {
-      setIsSubmitting(false)
       throw error
     }
   }
-
-  // Reset submitting state when transaction is confirmed or fails
-  useEffect(() => {
-    if (isSuccess || error || txError) {
-      setIsSubmitting(false)
-    }
-  }, [isSuccess, error, txError])
 
   return {
     submitPrompt,
