@@ -2,10 +2,9 @@
 import { defaultWagmiConfig } from '@web3modal/wagmi/react/config'
 import { cookieStorage, createStorage } from 'wagmi'
 import { polygon, polygonAmoy } from 'wagmi/chains'
-import { walletConnect, injected, coinbaseWallet } from 'wagmi/connectors'
 
 // Get projectId from https://cloud.walletconnect.com
-export const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'your-project-id'
+export const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '75f904f6a8fbccdee868ea6b30c4bf7d'
 
 if (!projectId) throw new Error('Project ID is not defined')
 
@@ -16,7 +15,7 @@ const metadata = {
   icons: ['https://promptpool.app/icon.png']
 }
 
-// Create wagmiConfig
+// Create wagmiConfig with enhanced mobile support
 const chains = [polygon, polygonAmoy] as const
 export const config = defaultWagmiConfig({
   chains,
@@ -26,26 +25,27 @@ export const config = defaultWagmiConfig({
   storage: createStorage({
     storage: cookieStorage
   }),
-  enableWalletConnect: true, // Optional - true by default
-  enableInjected: true, // Optional - true by default
-  enableCoinbase: true, // Optional - true by default
+  // Enhanced mobile wallet options
+  enableWalletConnect: true,
+  enableInjected: true,
+  enableCoinbase: true,
   enableEmail: true,
-  enableSocials: ['google', 'discord'],
-  connectors: [
-    injected(),
-    walletConnect({ projectId }),
-    coinbaseWallet({
-        appName: 'PromptPool',
-        appLogoUrl: 'https://promptpool.app/icon.png'
-    })
-]      
-
+  // Add social login options for mobile
+  enableSocials: ['google', 'discord', 'github', 'apple'],
+  // Enhanced mobile wallet detection
+  featuredWalletIds: [
+    'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
+    'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa', // Coinbase
+    '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0', // Trust Wallet
+    '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369', // Rainbow
+  ]
 })
 
 // Your contract configuration
 export const CONTRACT_CONFIG = {
   address: '0x2D6048916FD4017D9348563d442a3476a710D335' as const,
   abi: [
+    // ... your existing ABI stays the same
     {
       "type": "function",
       "name": "submitPrompt",
