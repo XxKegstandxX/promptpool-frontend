@@ -1886,149 +1886,166 @@ const validateReferralCode = async () => {
           </div>
         )}
 
-        {/* Team Page */}
-        {currentPage === 'team' && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div className="text-center mb-16">
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-teal-400 bg-clip-text text-transparent">
-                Our Team
-              </h1>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Meet the innovators building the future of AI-powered cryptocurrency and decentralized prompt training
-              </p>
-            </div>
+        {/* Team Page - Founder Story Version */}
+{currentPage === 'team' && (
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div className="text-center mb-16">
+      <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-teal-400 bg-clip-text text-transparent">
+        The Story Behind PromptPool
+      </h1>
+      <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+        Sometimes the biggest innovations come from the simplest ideas. 
+        This is the story of how one person's curiosity led to building the world's first AI that pays users.
+      </p>
+    </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-              <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 text-center transform hover:scale-105 transition-all duration-300">
-                <div className="w-20 h-20 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
-                  🚀
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">Alex Chen</h3>
-                <p className="text-teal-400 mb-3">Founder & CEO</p>
-                <p className="text-gray-400 text-sm mb-4">
-                  Former AI researcher with 8+ years in machine learning and blockchain. Previously led ML teams at Google and OpenAI. Passionate about democratizing AI development through crypto incentives.
-                </p>
-                <div className="flex justify-center space-x-3">
-                  <a href="#" className="text-teal-400 hover:text-white transition-colors">LinkedIn</a>
-                  <a href="#" className="text-teal-400 hover:text-white transition-colors">Twitter</a>
-                </div>
-              </div>
-              
-              <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 text-center transform hover:scale-105 transition-all duration-300">
-                <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
-                  ⚡
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">Sarah Martinez</h3>
-                <p className="text-purple-400 mb-3">CTO & Blockchain Lead</p>
-                <p className="text-gray-400 text-sm mb-4">
-                  Blockchain architect with experience building DeFi protocols handling $100M+ TVL. Expert in smart contract security, Web3 infrastructure, and scalable blockchain solutions.
-                </p>
-                <div className="flex justify-center space-x-3">
-                  <a href="#" className="text-purple-400 hover:text-white transition-colors">LinkedIn</a>
-                  <a href="#" className="text-purple-400 hover:text-white transition-colors">GitHub</a>
-                </div>
-              </div>
-              
-              <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 text-center transform hover:scale-105 transition-all duration-300">
-                <div className="w-20 h-20 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
-                  🎯
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">David Kim</h3>
-                <p className="text-yellow-400 mb-3">Head of AI & Research</p>
-                <p className="text-gray-400 text-sm mb-4">
-                  PhD in Computer Science from Stanford, specializing in NLP and training data optimization for large language models. Published 50+ papers on AI training methodologies.
-                </p>
-                <div className="flex justify-center space-x-3">
-                  <a href="#" className="text-yellow-400 hover:text-white transition-colors">Scholar</a>
-                  <a href="#" className="text-yellow-400 hover:text-white transition-colors">Twitter</a>
-                </div>
-              </div>
-
-              <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 text-center transform hover:scale-105 transition-all duration-300">
-                <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
-                  🎨
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">Maria Rodriguez</h3>
-                <p className="text-green-400 mb-3">Head of Design</p>
-                <p className="text-gray-400 text-sm mb-4">
-                  UX/UI designer with 6+ years creating intuitive Web3 experiences. Previously designed for Coinbase and Uniswap. Focuses on making crypto accessible to everyone.
-                </p>
-                <div className="flex justify-center space-x-3">
-                  <a href="#" className="text-green-400 hover:text-white transition-colors">Dribbble</a>
-                  <a href="#" className="text-green-400 hover:text-white transition-colors">Behance</a>
-                </div>
-              </div>
-
-              <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 text-center transform hover:scale-105 transition-all duration-300">
-                <div className="w-20 h-20 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
-                  📊
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">James Wilson</h3>
-                <p className="text-indigo-400 mb-3">Head of Operations</p>
-                <p className="text-gray-400 text-sm mb-4">
-                  Former Wall Street analyst turned crypto operations expert. Manages tokenomics, community growth, and strategic partnerships. MBA from Wharton.
-                </p>
-                <div className="flex justify-center space-x-3">
-                  <a href="#" className="text-indigo-400 hover:text-white transition-colors">LinkedIn</a>
-                  <a href="#" className="text-indigo-400 hover:text-white transition-colors">Medium</a>
-                </div>
-              </div>
-
-              <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 text-center transform hover:scale-105 transition-all duration-300">
-                <div className="w-20 h-20 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
-                  🛡️
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">Lisa Zhang</h3>
-                <p className="text-red-400 mb-3">Security Lead</p>
-                <p className="text-gray-400 text-sm mb-4">
-                  Cybersecurity expert with focus on blockchain security audits. Former security researcher at Trail of Bits. Ensures platform safety and smart contract integrity.
-                </p>
-                <div className="flex justify-center space-x-3">
-                  <a href="#" className="text-red-400 hover:text-white transition-colors">GitHub</a>
-                  <a href="#" className="text-red-400 hover:text-white transition-colors">Security Blog</a>
-                </div>
-              </div>
-            </div>
-
-            {/* Company Mission */}
-            <div className="bg-slate-800/30 backdrop-blur-sm border border-teal-500/20 rounded-xl p-12 text-center mb-16">
-              <h2 className="text-3xl font-bold text-white mb-8">Our Mission</h2>
-              <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed mb-8">
-                To create a sustainable ecosystem where AI advancement is driven by community participation, 
-                ensuring that contributors are fairly rewarded for their valuable input while building more 
-                diverse and robust AI training datasets. We believe the future of AI should be built by everyone, for everyone.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-                <div className="text-center">
-                  <div className="text-4xl mb-4">🌍</div>
-                  <h3 className="text-lg font-bold text-white mb-2">Global Impact</h3>
-                  <p className="text-gray-400">Making AI development accessible to contributors worldwide</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl mb-4">⚖️</div>
-                  <h3 className="text-lg font-bold text-white mb-2">Fair Rewards</h3>
-                  <p className="text-gray-400">Transparent, algorithmic reward distribution based on quality</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl mb-4">🔮</div>
-                  <h3 className="text-lg font-bold text-white mb-2">Future-Ready</h3>
-                  <p className="text-gray-400">Building infrastructure for the next generation of AI</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Join Us Section */}
-            <div className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 border border-teal-500/30 rounded-xl p-8 text-center">
-              <h2 className="text-2xl font-bold text-white mb-4">Join Our Team</h2>
-              <p className="text-gray-300 mb-6">
-                We're always looking for talented individuals who share our vision of democratizing AI development.
-              </p>
-              <button className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-semibold py-3 px-8 rounded-full transition-all duration-200 transform hover:scale-105">
-                View Open Positions
-              </button>
-            </div>
+    {/* Founder Story Section */}
+    <div className="bg-slate-800/30 backdrop-blur-sm border border-teal-500/20 rounded-xl p-12 mb-16">
+      <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-8 lg:space-y-0 lg:space-x-12">
+        {/* Founder Photo/Avatar */}
+        <div className="flex-shrink-0">
+          <div className="w-32 h-32 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full flex items-center justify-center text-5xl mx-auto">
+            👨‍💻
           </div>
-        )}
+          <div className="text-center mt-4">
+            <h3 className="text-xl font-bold text-white">The Founder</h3>
+            <p className="text-teal-400 text-sm">Just a guy with an idea</p>
+          </div>
+        </div>
+
+        {/* Story Content */}
+        <div className="flex-1 space-y-6">
+          <div className="bg-slate-700/30 border border-slate-600/30 rounded-lg p-6">
+            <h4 className="text-lg font-semibold text-teal-400 mb-3 flex items-center">
+              <span className="mr-2">🎓</span>
+              The Background
+            </h4>
+            <p className="text-gray-300 leading-relaxed">
+              I'm just an average person who went to college for electrical engineering and multimedia/web design. 
+              After graduation, I worked retail like millions of others, then eventually found my way into being a 
+              digital technician for photo and video production, contracting with large companies through my own business. 
+              Classic jack-of-all-trades story - you learn what you need to learn to get things done.
+            </p>
+          </div>
+
+          <div className="bg-slate-700/30 border border-slate-600/30 rounded-lg p-6">
+            <h4 className="text-lg font-semibold text-yellow-400 mb-3 flex items-center">
+              <span className="mr-2">💡</span>
+              The Idea
+            </h4>
+            <p className="text-gray-300 leading-relaxed">
+              One day, I was paying my $20/month for ChatGPT and thought: "What if this was backwards? What if instead of 
+              paying to use AI, people got paid to help make it better?" It seemed crazy at first, but the more I thought 
+              about it, the more it made sense. Why should only big corporations profit from AI when regular people are 
+              the ones making it smarter with their questions and feedback?
+            </p>
+          </div>
+
+          <div className="bg-slate-700/30 border border-slate-600/30 rounded-lg p-6">
+            <h4 className="text-lg font-semibold text-purple-400 mb-3 flex items-center">
+              <span className="mr-2">🛠️</span>
+              The Journey
+            </h4>
+            <p className="text-gray-300 leading-relaxed">
+              I had to learn everything from scratch. Blockchain development, smart contracts, React, TypeScript, 
+              crypto economics - none of this was in my original skill set. Spent months watching YouTube tutorials, 
+              reading docs, breaking things, and fixing them again. There were definitely moments where I questioned 
+              my sanity, but the vision kept me going: building something that puts power back in the hands of regular people.
+            </p>
+          </div>
+
+          <div className="bg-slate-700/30 border border-slate-600/30 rounded-lg p-6">
+            <h4 className="text-lg font-semibold text-green-400 mb-3 flex items-center">
+              <span className="mr-2">🚀</span>
+              The Reality
+            </h4>
+            <p className="text-gray-300 leading-relaxed">
+              PromptPool isn't just a project - it's proof that anyone with enough determination can build something 
+              revolutionary. No fancy degrees required, no venture capital, no team of 50 engineers. Just one person 
+              who believed that the future of AI should reward the people who make it possible, not extract value from them.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Skills & Technologies Learned */}
+    <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 mb-16">
+      <h2 className="text-2xl font-bold text-white mb-8 text-center">Technologies Mastered Along the Way</h2>
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {[
+          { name: 'React', emoji: '⚛️', color: 'from-blue-500 to-cyan-500' },
+          { name: 'TypeScript', emoji: '📘', color: 'from-blue-600 to-blue-400' },
+          { name: 'Solidity', emoji: '🔗', color: 'from-purple-500 to-indigo-500' },
+          { name: 'Web3', emoji: '🌐', color: 'from-green-500 to-teal-500' },
+          { name: 'Next.js', emoji: '⚡', color: 'from-gray-600 to-gray-400' },
+          { name: 'PostgreSQL', emoji: '🐘', color: 'from-indigo-500 to-blue-500' },
+          { name: 'IPFS', emoji: '🌍', color: 'from-orange-500 to-red-500' },
+          { name: 'Smart Contracts', emoji: '📜', color: 'from-yellow-500 to-orange-500' },
+          { name: 'Crypto Economics', emoji: '💰', color: 'from-green-600 to-emerald-500' },
+          { name: 'UI/UX Design', emoji: '🎨', color: 'from-pink-500 to-rose-500' },
+          { name: 'DevOps', emoji: '🚀', color: 'from-purple-600 to-pink-500' },
+          { name: 'Token Economics', emoji: '🪙', color: 'from-amber-500 to-yellow-500' }
+        ].map((tech, index) => (
+          <div key={index} className="text-center">
+            <div className={`w-16 h-16 bg-gradient-to-r ${tech.color} rounded-full flex items-center justify-center text-2xl mx-auto mb-2`}>
+              {tech.emoji}
+            </div>
+            <p className="text-xs text-gray-300">{tech.name}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Future Team Section */}
+    <div className="bg-slate-800/30 backdrop-blur-sm border border-teal-500/20 rounded-xl p-12 text-center mb-16">
+      <h2 className="text-3xl font-bold text-white mb-8">Building the Team</h2>
+      <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed mb-8">
+        What started as a solo mission is growing into something bigger. We're looking for passionate individuals 
+        who believe in democratizing AI and putting power back in the hands of the people. No fancy credentials 
+        required - just curiosity, determination, and a shared vision of a better future.
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+        <div className="text-center">
+          <div className="text-4xl mb-4">🌍</div>
+          <h3 className="text-lg font-bold text-white mb-2">Global Impact</h3>
+          <p className="text-gray-400">Making AI development accessible to contributors worldwide</p>
+        </div>
+        <div className="text-center">
+          <div className="text-4xl mb-4">⚖️</div>
+          <h3 className="text-lg font-bold text-white mb-2">Fair Rewards</h3>
+          <p className="text-gray-400">Transparent, algorithmic reward distribution based on quality</p>
+        </div>
+        <div className="text-center">
+          <div className="text-4xl mb-4">🔮</div>
+          <h3 className="text-lg font-bold text-white mb-2">Future-Ready</h3>
+          <p className="text-gray-400">Building infrastructure for the next generation of AI</p>
+        </div>
+      </div>
+    </div>
+
+    {/* Join Us Section */}
+    <div className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 border border-teal-500/30 rounded-xl p-8 text-center">
+      <h2 className="text-2xl font-bold text-white mb-4">Join Our Mission</h2>
+      <p className="text-gray-300 mb-6">
+        Ready to be part of something revolutionary? We're looking for people who share our vision of an AI future 
+        that rewards contributors, not just corporations. Whether you're a developer, designer, marketer, or just 
+        someone with great ideas - we want to hear from you.
+      </p>
+      <button 
+        className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-semibold py-3 px-8 rounded-full transition-all duration-200 transform hover:scale-105"
+        onClick={() => window.open('mailto:team@promptpool.app?subject=Interested in Joining PromptPool&body=Hi! I\'m interested in joining the PromptPool team. Here\'s a bit about me and what I can contribute:', '_blank')}
+      >
+        Get In Touch 🚀
+      </button>
+      <p className="text-sm text-gray-400 mt-4">
+        Click to send us an email, or reach out through any of our social channels
+      </p>
+    </div>
+  </div>
+)}
+
+            
 
         {/* Contact Page */}
         {currentPage === 'contact' && (
