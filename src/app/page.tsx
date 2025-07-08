@@ -14,6 +14,7 @@ import {
   useTierInfo
 } from '../hooks/usePromptPool'
 import { uploadPromptToIPFS, getIPFSConfig } from '../lib/ipfs'
+import { ReferralService } from '../lib/supabase'
 
 // Import the floating particles component
 const FloatingParticles = () => {
@@ -83,6 +84,340 @@ const FloatingParticles = () => {
   )
 }
 
+// Quick Help Modal Component
+const QuickHelpModal = ({ 
+  activeModal, 
+  onClose, 
+  ipfsConfig 
+}: { 
+  activeModal: string | null, 
+  onClose: () => void,
+  ipfsConfig: { isDemo: boolean }
+}) => {
+  if (!activeModal) return null
+
+  const helpContent = {
+    wallet: {
+      title: "🔗 How to Connect Your Wallet",
+      content: (
+        <div className="space-y-4">
+          <div className="bg-blue-500/10 border border-blue-400/30 rounded-lg p-4">
+            <h4 className="text-blue-400 font-semibold mb-2">Option 1: Web3Modal (Recommended)</h4>
+            <ol className="text-sm text-gray-300 space-y-2 list-decimal list-inside">
+              <li>Click the purple "Connect Wallet" button</li>
+              <li>Choose from 300+ supported wallets</li>
+              <li>Follow the prompts in your wallet app</li>
+              <li>Approve the connection</li>
+            </ol>
+          </div>
+          
+          <div className="bg-teal-500/10 border border-teal-400/30 rounded-lg p-4">
+            <h4 className="text-teal-400 font-semibold mb-2">Option 2: MetaMask Direct</h4>
+            <ol className="text-sm text-gray-300 space-y-2 list-decimal list-inside">
+              <li>Install MetaMask browser extension or mobile app</li>
+              <li>Click the green "Connect with MetaMask" button</li>
+              <li>Approve the connection in MetaMask</li>
+              <li>Switch to Polygon network if prompted</li>
+            </ol>
+          </div>
+
+          <div className="bg-orange-500/10 border border-orange-400/30 rounded-lg p-4">
+            <h4 className="text-orange-400 font-semibold mb-2">📱 Mobile Users</h4>
+            <p className="text-sm text-gray-300">
+              If MetaMask doesn't open automatically, we'll provide a direct link to open the MetaMask app. 
+              Make sure you have MetaMask installed first!
+            </p>
+          </div>
+
+          <div className="bg-yellow-500/10 border border-yellow-400/30 rounded-lg p-4">
+            <h4 className="text-yellow-400 font-semibold mb-2">⚠️ Troubleshooting</h4>
+            <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
+              <li>Make sure you're on the Polygon network</li>
+              <li>Try refreshing the page if connection fails</li>
+              <li>Check that your wallet isn't already connected to another dapp</li>
+              <li>Disable other wallet extensions to avoid conflicts</li>
+            </ul>
+          </div>
+        </div>
+      )
+    },
+    rewards: {
+      title: "💰 How Rewards Work",
+      content: (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-orange-500/10 border border-orange-400/30 rounded-lg p-4">
+              <div className="flex items-center mb-2">
+                <span className="text-2xl mr-2">🥉</span>
+                <h4 className="text-orange-400 font-semibold">Bronze (5-10 POOL)</h4>
+              </div>
+              <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
+                <li>Automatic approval</li>
+                <li>Instant payment</li>
+                <li>Basic quality prompts</li>
+                <li>Perfect for beginners</li>
+              </ul>
+            </div>
+
+            <div className="bg-gray-400/10 border border-gray-400/30 rounded-lg p-4">
+              <div className="flex items-center mb-2">
+                <span className="text-2xl mr-2">🥈</span>
+                <h4 className="text-gray-300 font-semibold">Silver (15-25 POOL)</h4>
+              </div>
+              <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
+                <li>Automatic approval</li>
+                <li>Instant payment</li>
+                <li>Good quality required</li>
+                <li>Higher rewards</li>
+              </ul>
+            </div>
+
+            <div className="bg-yellow-500/10 border border-yellow-400/30 rounded-lg p-4">
+              <div className="flex items-center mb-2">
+                <span className="text-2xl mr-2">🥇</span>
+                <h4 className="text-yellow-400 font-semibold">Gold (30-50 POOL)</h4>
+              </div>
+              <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
+                <li>Manual review</li>
+                <li>24-48h approval</li>
+                <li>High quality prompts</li>
+                <li>Expert evaluation</li>
+              </ul>
+            </div>
+
+            <div className="bg-purple-500/10 border border-purple-400/30 rounded-lg p-4">
+              <div className="flex items-center mb-2">
+                <span className="text-2xl mr-2">💎</span>
+                <h4 className="text-purple-400 font-semibold">Platinum (75-100 POOL)</h4>
+              </div>
+              <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
+                <li>Expert panel review</li>
+                <li>2-7 day approval</li>
+                <li>Exceptional quality</li>
+                <li>Highest rewards</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="bg-teal-500/10 border border-teal-400/30 rounded-lg p-4">
+            <h4 className="text-teal-400 font-semibold mb-2">🎯 How Tiers Are Determined</h4>
+            <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
+              <li><strong>Length:</strong> Longer, detailed prompts score higher</li>
+              <li><strong>Originality:</strong> Unique prompts get better tiers</li>
+              <li><strong>Category:</strong> Technical prompts often score higher</li>
+              <li><strong>User Reputation:</strong> Better history = higher tiers</li>
+              <li><strong>Training Value:</strong> How useful for AI training</li>
+            </ul>
+          </div>
+
+          <div className="bg-green-500/10 border border-green-400/30 rounded-lg p-4">
+            <h4 className="text-green-400 font-semibold mb-2">🚀 Pro Tips</h4>
+            <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
+              <li>Start with Bronze/Silver to build reputation</li>
+              <li>Detailed prompts (100+ words) perform better</li>
+              <li>Include context and examples in your prompts</li>
+              <li>Consistent quality submissions increase your tier over time</li>
+            </ul>
+          </div>
+        </div>
+      )
+    },
+    prompts: {
+      title: "📝 What Makes a Good Prompt",
+      content: (
+        <div className="space-y-4">
+          <div className="bg-green-500/10 border border-green-400/30 rounded-lg p-4">
+            <h4 className="text-green-400 font-semibold mb-2">✅ Good Prompt Characteristics</h4>
+            <ul className="text-sm text-gray-300 space-y-2 list-disc list-inside">
+              <li><strong>Clear and Specific:</strong> Exactly what you want the AI to do</li>
+              <li><strong>Detailed Context:</strong> Background information and constraints</li>
+              <li><strong>Examples Included:</strong> Show the AI what good output looks like</li>
+              <li><strong>Proper Length:</strong> Minimum 50 words, ideally 100-300 words</li>
+              <li><strong>Well-Structured:</strong> Organized with clear sections</li>
+              <li><strong>Original Content:</strong> Your own creative work, not copied</li>
+            </ul>
+          </div>
+
+          <div className="bg-blue-500/10 border border-blue-400/30 rounded-lg p-4">
+            <h4 className="text-blue-400 font-semibold mb-2">💎 Example: High-Quality Prompt</h4>
+            <div className="bg-slate-800/50 rounded p-3 text-sm text-gray-300 font-mono">
+              <p className="mb-2"><strong>Title:</strong> "Creative Writing Assistant for Sci-Fi Stories"</p>
+              <p className="mb-2"><strong>Category:</strong> Creative Writing</p>
+              <p><strong>Content:</strong> "You are a creative writing assistant specializing in science fiction. Help writers develop compelling sci-fi stories by providing: 1) Unique plot concepts that haven't been overused, 2) Scientifically plausible explanations for futuristic technology, 3) Character development suggestions for diverse casts. When suggesting plots, always include a brief scientific explanation for key technologies. Focus on stories that explore human nature through technological advancement. Example output format: 'Plot: [concept] | Science: [explanation] | Characters: [suggestions]'"</p>
+            </div>
+          </div>
+
+          <div className="bg-red-500/10 border border-red-400/30 rounded-lg p-4">
+            <h4 className="text-red-400 font-semibold mb-2">❌ Avoid These Mistakes</h4>
+            <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
+              <li>Too vague: "Help me write something"</li>
+              <li>Too short: Single sentence prompts</li>
+              <li>Copied content: Prompts found elsewhere online</li>
+              <li>No context: Jumping straight to requests</li>
+              <li>Poor grammar: Makes prompts hard to understand</li>
+              <li>Inappropriate content: Keep it professional and helpful</li>
+            </ul>
+          </div>
+
+          <div className="bg-yellow-500/10 border border-yellow-400/30 rounded-lg p-4">
+            <h4 className="text-yellow-400 font-semibold mb-2">🎯 Categories That Perform Well</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-300">
+              <div>
+                <p><strong>Technical/Programming:</strong></p>
+                <ul className="list-disc list-inside text-xs space-y-1 mt-1">
+                  <li>Code generation prompts</li>
+                  <li>Debugging assistance</li>
+                  <li>Architecture explanations</li>
+                </ul>
+              </div>
+              <div>
+                <p><strong>Educational:</strong></p>
+                <ul className="list-disc list-inside text-xs space-y-1 mt-1">
+                  <li>Step-by-step tutorials</li>
+                  <li>Concept explanations</li>
+                  <li>Learning activities</li>
+                </ul>
+              </div>
+              <div>
+                <p><strong>Creative Writing:</strong></p>
+                <ul className="list-disc list-inside text-xs space-y-1 mt-1">
+                  <li>Story development</li>
+                  <li>Character creation</li>
+                  <li>World building</li>
+                </ul>
+              </div>
+              <div>
+                <p><strong>Analytical:</strong></p>
+                <ul className="list-disc list-inside text-xs space-y-1 mt-1">
+                  <li>Data analysis tasks</li>
+                  <li>Research methodologies</li>
+                  <li>Problem-solving frameworks</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    ipfs: {
+      title: "🌐 What is IPFS Storage",
+      content: (
+        <div className="space-y-4">
+          <div className="bg-blue-500/10 border border-blue-400/30 rounded-lg p-4">
+            <h4 className="text-blue-400 font-semibold mb-2">🌍 IPFS Explained Simply</h4>
+            <p className="text-sm text-gray-300 mb-2">
+              IPFS (InterPlanetary File System) is like a global, permanent filing cabinet that no single company controls. 
+              When you submit a prompt, it gets stored across multiple computers worldwide, making it:
+            </p>
+            <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
+              <li><strong>Permanent:</strong> Your prompts can never be deleted or lost</li>
+              <li><strong>Decentralized:</strong> No single point of failure</li>
+              <li><strong>Verifiable:</strong> Each file gets a unique, unchangeable fingerprint</li>
+              <li><strong>Accessible:</strong> Available from anywhere in the world</li>
+            </ul>
+          </div>
+
+          <div className="bg-teal-500/10 border border-teal-400/30 rounded-lg p-4">
+            <h4 className="text-teal-400 font-semibold mb-2">🔒 Why We Use IPFS</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-300">
+              <div>
+                <p><strong>vs Traditional Servers:</strong></p>
+                <ul className="list-disc list-inside text-xs space-y-1 mt-1">
+                  <li>✅ Can't be shut down</li>
+                  <li>✅ No censorship risk</li>
+                  <li>✅ Global availability</li>
+                  <li>✅ Lower costs</li>
+                </ul>
+              </div>
+              <div>
+                <p><strong>vs Cloud Storage:</strong></p>
+                <ul className="list-disc list-inside text-xs space-y-1 mt-1">
+                  <li>✅ You own your data</li>
+                  <li>✅ No monthly fees</li>
+                  <li>✅ Cannot be deleted</li>
+                  <li>✅ Cryptographically verified</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-purple-500/10 border border-purple-400/30 rounded-lg p-4">
+            <h4 className="text-purple-400 font-semibold mb-2">🔗 Your IPFS Hash</h4>
+            <p className="text-sm text-gray-300 mb-2">
+              When you submit a prompt, you get an IPFS hash that looks like: 
+              <code className="bg-slate-800 px-2 py-1 rounded text-teal-400 ml-1">QmX7x8x9x...</code>
+            </p>
+            <p className="text-sm text-gray-300 mb-2">This hash is like a permanent address for your content. You can:</p>
+            <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
+              <li>View it on any IPFS gateway</li>
+              <li>Share it with others</li>
+              <li>Prove you created the content</li>
+              <li>Access it forever</li>
+            </ul>
+          </div>
+
+          <div className="bg-green-500/10 border border-green-400/30 rounded-lg p-4">
+            <h4 className="text-green-400 font-semibold mb-2">⚡ Current Status</h4>
+            <div className={`flex items-center space-x-2 mb-2 ${ipfsConfig.isDemo ? 'text-yellow-400' : 'text-green-400'}`}>
+              <div className="text-lg">{ipfsConfig.isDemo ? '🧪' : '🌐'}</div>
+              <span className="font-semibold">{ipfsConfig.isDemo ? 'Demo Mode' : 'Production Mode'}</span>
+            </div>
+            <p className="text-sm text-gray-300">
+              {ipfsConfig.isDemo 
+                ? 'Currently using simulated IPFS for testing. Your prompts are saved locally but will be moved to real IPFS in production.'
+                : 'Your prompts are being stored on real IPFS via Pinata, making them permanently accessible worldwide.'
+              }
+            </p>
+          </div>
+
+          <div className="bg-orange-500/10 border border-orange-400/30 rounded-lg p-4">
+            <h4 className="text-orange-400 font-semibold mb-2">🔍 Learn More</h4>
+            <p className="text-sm text-gray-300 mb-2">Want to explore IPFS further?</p>
+            <div className="flex flex-wrap gap-2">
+              <a href="https://ipfs.io/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-white text-xs bg-slate-800 px-3 py-1 rounded transition-colors">
+                IPFS.io →
+              </a>
+              <a href="https://docs.ipfs.io/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-white text-xs bg-slate-800 px-3 py-1 rounded transition-colors">
+                Documentation →
+              </a>
+              <a href="https://pinata.cloud/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-white text-xs bg-slate-800 px-3 py-1 rounded transition-colors">
+                Pinata →
+              </a>
+            </div>
+          </div>
+        </div>
+      )
+    }
+  }
+
+  const currentContent = helpContent[activeModal as keyof typeof helpContent]
+  if (!currentContent) return null
+
+  return (
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-slate-900 border border-teal-500/30 rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-slate-700">
+          <h3 className="text-2xl font-bold text-white">{currentContent.title}</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white transition-colors p-1"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        {/* Content */}
+        <div className="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
+          {currentContent.content}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Your live contract details (keeping for ethers fallback)
 const CONTRACT_ADDRESS = "0x2D6048916FD4017D9348563d442a3476a710D335"
 const CONTRACT_ABI = [
@@ -133,7 +468,20 @@ export default function PromptPoolApp() {
     }
     return []
   })
-  
+  // Referral state
+const [referralCode, setReferralCode] = useState('')
+const [userReferralCode, setUserReferralCode] = useState('')
+const [referralStats, setReferralStats] = useState({
+  totalReferrals: 0,
+  totalEarnings: 0,
+  referralCode: '',
+  referredUsers: []
+})
+const [isReferralApplied, setIsReferralApplied] = useState(false)
+
+// Modal state for Quick Help
+const [activeModal, setActiveModal] = useState<string | null>(null)
+
   // Legacy ethers states (keeping for fallback)
   const [isConnected, setIsConnected] = useState(false)
   const [account, setAccount] = useState<string>('')
@@ -270,7 +618,87 @@ const disconnectWallet = async () => {
       console.error('Error loading user data:', error)
     }
   }
+// Check URL for referral code on page load
+useEffect(() => {
+  const urlParams = new URLSearchParams(window.location.search)
+  const refCode = urlParams.get('ref')
+  if (refCode) {
+    setReferralCode(refCode.toUpperCase())
+  }
+}, [])
 
+// When user connects, create/get their profile and handle referrals
+useEffect(() => {
+  const handleUserConnection = async () => {
+    if ((isWagmiConnected || isConnected) && (address || account)) {
+      const userAddress = address || account
+      
+      // Create/get user profile
+      await ReferralService.createUser(userAddress)
+      
+      // Load their referral stats
+      const stats = await ReferralService.getReferralStats(userAddress)
+      if (stats) {
+        setReferralStats(stats)
+        setUserReferralCode(stats.referralCode)
+      }
+      
+      // If they used a referral code and haven't been referred yet
+      if (referralCode && !isReferralApplied) {
+        const success = await ReferralService.trackReferral(userAddress, referralCode)
+        if (success) {
+          setIsReferralApplied(true)
+          addToast({
+            type: 'success',
+            title: 'Referral Applied!',
+            message: 'Your referrer will earn 10% of your rewards'
+          })
+        } else {
+          addToast({
+            type: 'error',
+            title: 'Invalid Referral Code',
+            message: 'Please check the referral code and try again'
+          })
+        }
+      }
+    }
+  }
+  
+  handleUserConnection()
+}, [isWagmiConnected, isConnected, address, account, referralCode, isReferralApplied])
+
+// Copy referral link function
+const copyReferralLink = () => {
+  const baseUrl = window.location.origin
+  const referralLink = `${baseUrl}?ref=${userReferralCode}`
+  navigator.clipboard.writeText(referralLink)
+  
+  addToast({
+    type: 'success',
+    title: 'Referral Link Copied!',
+    message: 'Share this link to earn 10% of your friends\' rewards'
+  })
+}
+
+// Validate referral code function
+const validateReferralCode = async () => {
+  if (!referralCode.trim()) return
+  
+  const user = await ReferralService.getUserByReferralCode(referralCode)
+  if (user) {
+    addToast({
+      type: 'success',
+      title: 'Valid Referral Code!',
+      message: 'This code will be applied when you connect your wallet'
+    })
+  } else {
+    addToast({
+      type: 'error',
+      title: 'Invalid Referral Code',
+      message: 'Please check the code and try again'
+    })
+  }
+}
   // Fixed prompt submission with proper toast cleanup and contribution tracking
   const handleSubmitPrompt = async () => {
     if (!promptTitle || !promptContent || promptContent.length < 20) {
@@ -833,6 +1261,7 @@ const disconnectWallet = async () => {
                 Start earning POOL tokens by contributing valuable prompts with IPFS storage and instant blockchain rewards
               </p>
             </div>
+
         {/* POL Gas Faucet Callout */}
 <div className="mb-12">
   <div className="bg-gradient-to-r from-teal-500/10 via-cyan-400/10 to-blue-500/10 border border-teal-400/30 rounded-xl p-6 backdrop-blur-sm">
@@ -864,6 +1293,121 @@ const disconnectWallet = async () => {
     </div>
   </div>
 </div>
+
+{/* Help & Tips Section */}
+<div className="mb-12">
+  <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8">
+    <h3 className="text-2xl font-bold text-white mb-6 text-center flex items-center justify-center">
+      <span className="mr-3">💡</span>
+      Quick Help & Tips
+    </h3>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <button 
+        onClick={() => setActiveModal('prompts')}
+        className="bg-green-500/10 border border-green-400/30 rounded-lg p-4 text-left hover:bg-green-500/20 transition-colors"
+      >
+        <div className="flex items-center mb-2">
+          <span className="text-2xl mr-3">📝</span>
+          <h4 className="text-green-400 font-semibold">What makes a good prompt?</h4>
+        </div>
+        <p className="text-sm text-gray-300">Learn how to write high-quality prompts that earn more POOL tokens</p>
+      </button>
+      
+      <button 
+        onClick={() => setActiveModal('rewards')}
+        className="bg-yellow-500/10 border border-yellow-400/30 rounded-lg p-4 text-left hover:bg-yellow-500/20 transition-colors"
+      >
+        <div className="flex items-center mb-2">
+          <span className="text-2xl mr-3">💰</span>
+          <h4 className="text-yellow-400 font-semibold">How do rewards work?</h4>
+        </div>
+        <p className="text-sm text-gray-300">Understand the tier system and how to maximize your earnings</p>
+      </button>
+      
+      <button 
+        onClick={() => setActiveModal('wallet')}
+        className="bg-blue-500/10 border border-blue-400/30 rounded-lg p-4 text-left hover:bg-blue-500/20 transition-colors"
+      >
+        <div className="flex items-center mb-2">
+          <span className="text-2xl mr-3">🔗</span>
+          <h4 className="text-blue-400 font-semibold">How to connect wallet?</h4>
+        </div>
+        <p className="text-sm text-gray-300">Step-by-step guide for connecting MetaMask and other wallets</p>
+      </button>
+      
+      <button 
+        onClick={() => setActiveModal('ipfs')}
+        className="bg-purple-500/10 border border-purple-400/30 rounded-lg p-4 text-left hover:bg-purple-500/20 transition-colors"
+      >
+        <div className="flex items-center mb-2">
+          <span className="text-2xl mr-3">🌐</span>
+          <h4 className="text-purple-400 font-semibold">What is IPFS storage?</h4>
+        </div>
+        <p className="text-sm text-gray-300">Learn about permanent, decentralized storage for your prompts</p>
+      </button>
+    </div>
+  </div>
+</div>
+
+{/* Referral Code Input - Shows when user is NOT connected */}
+{!displayIsConnected && (
+  <div className="mb-8">
+    <div className="bg-blue-500/10 border border-blue-400/30 rounded-xl p-6">
+      <h3 className="text-lg font-bold text-blue-400 mb-4 flex items-center">
+        <span className="mr-2">🎁</span>
+        Have a Referral Code?
+      </h3>
+      <p className="text-gray-300 mb-4 text-sm">
+        Enter a friend's referral code and they'll earn 10% of your POOL rewards!
+      </p>
+      <div className="flex space-x-3">
+        <input
+          type="text"
+          placeholder="Enter referral code (optional)"
+          value={referralCode}
+          onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+          className="flex-1 px-4 py-3 bg-slate-700/50 border border-blue-500/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
+        />
+        <button 
+          onClick={validateReferralCode}
+          disabled={!referralCode.trim()}
+          className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg transition-colors"
+        >
+          Validate
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+{!displayIsConnected && (
+  <div className="mb-8">
+    <div className="bg-blue-500/10 border border-blue-400/30 rounded-xl p-6">
+      <h3 className="text-lg font-bold text-blue-400 mb-4 flex items-center">
+        <span className="mr-2">🎁</span>
+        Have a Referral Code?
+      </h3>
+      <p className="text-gray-300 mb-4 text-sm">
+        Enter a friend's referral code and they'll earn 10% of your POOL rewards!
+      </p>
+      <div className="flex space-x-3">
+        <input
+          type="text"
+          placeholder="Enter referral code (optional)"
+          value={referralCode}
+          onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+          className="flex-1 px-4 py-3 bg-slate-700/50 border border-blue-500/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
+        />
+        <button 
+          onClick={validateReferralCode}
+          disabled={!referralCode.trim()}
+          className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg transition-colors"
+        >
+          Validate
+        </button>
+      </div>
+    </div>
+  </div>
+)}
             {!displayIsConnected ? (
               <div className="text-center py-16">
                 <div className="text-6xl mb-6">🔗</div>
@@ -1140,6 +1684,58 @@ const disconnectWallet = async () => {
                 </div>
               </div>
             )}
+            {/* Referral Dashboard - Shows when user IS connected */}
+{displayIsConnected && (
+  <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 mb-8">
+    <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
+      <span className="mr-3">👥</span>
+      Refer Friends & Earn
+    </h3>
+    
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      {/* Your Referral Code */}
+      <div className="text-center">
+        <h4 className="text-lg font-semibold text-teal-400 mb-3">Your Referral Code</h4>
+        <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
+          <code className="text-white font-mono text-xl">{userReferralCode}</code>
+        </div>
+        <button 
+          onClick={copyReferralLink}
+          className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center mx-auto space-x-2"
+        >
+          <span>📋</span>
+          <span>Copy Link</span>
+        </button>
+      </div>
+      
+      {/* Referral Stats */}
+      <div className="text-center">
+        <h4 className="text-lg font-semibold text-teal-400 mb-3">Friends Referred</h4>
+        <div className="text-3xl font-bold text-white mb-2">{referralStats.totalReferrals}</div>
+        <div className="text-gray-400 text-sm">People joined through your link</div>
+      </div>
+      
+      <div className="text-center">
+        <h4 className="text-lg font-semibold text-teal-400 mb-3">Bonus Earned</h4>
+        <div className="text-3xl font-bold text-green-400 mb-2">
+          {parseFloat(referralStats.totalEarnings || '0').toFixed(1)} POOL
+        </div>
+        <div className="text-gray-400 text-sm">10% of friends' rewards</div>
+      </div>
+    </div>
+    
+    {/* How it works */}
+    <div className="bg-slate-700/30 rounded-lg p-4">
+      <h5 className="text-white font-semibold mb-2">💡 How Referrals Work:</h5>
+      <ul className="text-gray-300 text-sm space-y-1">
+        <li>• Share your referral link with friends</li>
+        <li>• When they submit prompts and earn POOL, you get 10% bonus</li>
+        <li>• No limit on referrals - the more friends, the more you earn!</li>
+        <li>• Bonuses are paid automatically with each prompt submission</li>
+      </ul>
+    </div>
+  </div>
+)}
           </div>
         )}
 
@@ -1410,24 +2006,7 @@ const disconnectWallet = async () => {
                   </div>
                 </div>
 
-                {/* FAQ Quick Links */}
-                <div className="mt-8 pt-6 border-t border-slate-600/30">
-                  <h4 className="text-lg font-semibold text-white mb-4">Quick Help</h4>
-                  <div className="space-y-2">
-                    <a href="#" className="block text-sm text-teal-400 hover:text-white transition-colors">
-                      🔗 How to connect wallet?
-                    </a>
-                    <a href="#" className="block text-sm text-teal-400 hover:text-white transition-colors">
-                      💰 How do rewards work?
-                    </a>
-                    <a href="#" className="block text-sm text-teal-400 hover:text-white transition-colors">
-                      📝 What makes a good prompt?
-                    </a>
-                    <a href="#" className="block text-sm text-teal-400 hover:text-white transition-colors">
-                      🌐 What is IPFS storage?
-                    </a>
-                  </div>
-                </div>
+              
               </div>
             </div>
 
@@ -1469,6 +2048,12 @@ const disconnectWallet = async () => {
           </div>
         )}
       </main>
+  {/* Quick Help Modal */}
+      <QuickHelpModal 
+        activeModal={activeModal} 
+        onClose={() => setActiveModal(null)} 
+        ipfsConfig={ipfsConfig}
+      />
     </div>
   )
 }
