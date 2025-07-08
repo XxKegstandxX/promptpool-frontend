@@ -1119,28 +1119,175 @@ const validateReferralCode = async () => {
               </div>
             </div>
 
-            {/* Enhanced Roadmap Section */}
-            <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 mb-16">
-              <h2 className="text-3xl font-bold text-center text-white mb-8">Development Roadmap</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-6">
-                  <h4 className="text-lg font-bold text-green-400 mb-2">✅ Phase 1: Complete</h4>
-                  <p className="text-sm text-gray-300">wagmi integration, Web3Modal, IPFS storage, toast notifications.</p>
-                </div>
-                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-6">
-                  <h4 className="text-lg font-bold text-yellow-400 mb-2">🚧 Phase 2: In Progress</h4>
-                  <p className="text-sm text-gray-300">Prompt marketplace, advanced filtering, user profiles.</p>
-                </div>
-                <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-6">
-                  <h4 className="text-lg font-bold text-purple-400 mb-2">📋 Phase 3: Planned</h4>
-                  <p className="text-sm text-gray-300">Mobile app, governance features, AI partnerships.</p>
-                </div>
-                <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6">
-                  <h4 className="text-lg font-bold text-blue-400 mb-2">🌟 Phase 4: Future</h4>
-                  <p className="text-sm text-gray-300">Global scaling, enterprise solutions, advanced AI integration.</p>
-                </div>
-              </div>
+            {/* Strategic Roadmap Section - Updated */}
+<div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 mb-16">
+  <div className="text-center mb-8">
+    <h2 className="text-3xl font-bold text-white mb-4">Strategic Roadmap</h2>
+    <p className="text-gray-300 max-w-2xl mx-auto">
+      Building the world's first AI that <strong className="text-teal-400">pays users to use it</strong> - 
+      a community-owned alternative to corporate AI monopolies
+    </p>
+  </div>
+
+  {/* Timeline with Connected Flow */}
+  <div className="relative">
+    {/* Connection Line */}
+    <div className="absolute top-20 left-1/2 transform -translate-x-1/2 w-0.5 h-96 bg-gradient-to-b from-green-400 via-teal-400 to-purple-400 opacity-30 hidden lg:block"></div>
+    
+    <div className="space-y-8">
+      {/* Phase 1: Foundation - COMPLETE */}
+      <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-4 lg:space-y-0 lg:space-x-8">
+        <div className="lg:w-1/2 lg:text-right">
+          <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-6 relative">
+            <div className="absolute -top-3 -right-3 bg-green-500 text-black px-2 py-1 rounded-full text-xs font-bold">
+              COMPLETE
             </div>
+            <h3 className="text-xl font-bold text-green-400 mb-3">
+              🏗️ Phase 1: Foundation
+            </h3>
+            <div className="text-sm text-gray-300 space-y-2">
+              <div>✅ Production DApp on Polygon mainnet</div>
+              <div>✅ Smart contract with real POOL rewards</div>
+              <div>✅ Secure IPFS storage via Pinata</div>
+              <div>✅ Professional UI/UX with mobile support</div>
+              <div>✅ Dual wallet integration (Web3Modal + MetaMask)</div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex-shrink-0">
+          <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold text-xl">
+            1
+          </div>
+        </div>
+        
+        <div className="lg:w-1/2">
+          <div className="text-center lg:text-left">
+            <div className="text-sm text-green-400 font-semibold mb-1">COMPLETED</div>
+            <div className="text-gray-300">Solid foundation with real users earning POOL tokens</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Phase 2: Viral Growth - IN PROGRESS */}
+      <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-4 lg:space-y-0 lg:space-x-8">
+        <div className="lg:w-1/2 lg:text-right">
+          <div className="text-center lg:text-right">
+            <div className="text-sm text-teal-400 font-semibold mb-1">IN PROGRESS</div>
+            <div className="text-gray-300">Building viral referral engine for exponential growth</div>
+          </div>
+        </div>
+        
+        <div className="flex-shrink-0">
+          <div className="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center text-black font-bold text-xl relative">
+            2
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-teal-400 rounded-full animate-pulse"></div>
+          </div>
+        </div>
+        
+        <div className="lg:w-1/2">
+          <div className="bg-teal-500/10 border border-teal-500/30 rounded-xl p-6 relative">
+            <div className="absolute -top-3 -right-3 bg-teal-500 text-black px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+              ACTIVE
+            </div>
+            <h3 className="text-xl font-bold text-teal-400 mb-3">
+              📈 Phase 2: Viral Growth
+            </h3>
+            <div className="text-sm text-gray-300 space-y-2">
+              <div>✅ Referral system with 10% rewards</div>
+              <div>✅ Comprehensive help system</div>
+              <div>🔄 Automated bonus payments</div>
+              <div>🎯 User leaderboards & social features</div>
+              <div>🎯 Target: 100+ active users, viral coefficient > 1.0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Phase 3: Token Liquidity - NEXT */}
+      <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-4 lg:space-y-0 lg:space-x-8">
+        <div className="lg:w-1/2 lg:text-right">
+          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6 relative">
+            <div className="absolute -top-3 -right-3 bg-yellow-500 text-black px-2 py-1 rounded-full text-xs font-bold">
+              NEXT
+            </div>
+            <h3 className="text-xl font-bold text-yellow-400 mb-3">
+              💰 Phase 3: Token Market
+            </h3>
+            <div className="text-sm text-gray-300 space-y-2">
+              <div>🎯 POOL/USDC liquidity pool on QuickSwap</div>
+              <div>🎯 $10K-25K initial liquidity</div>
+              <div>🎯 Token trading & price discovery</div>
+              <div>🎯 Staking rewards for long-term holders</div>
+              <div>🎯 Enterprise partnerships & token utility</div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex-shrink-0">
+          <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-black font-bold text-xl">
+            3
+          </div>
+        </div>
+        
+        <div className="lg:w-1/2">
+          <div className="text-center lg:text-left">
+            <div className="text-sm text-yellow-400 font-semibold mb-1">4-6 WEEKS</div>
+            <div className="text-gray-300">Creating sustainable token economy</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Phase 4: AI Revolution - FUTURE */}
+      <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-4 lg:space-y-0 lg:space-x-8">
+        <div className="lg:w-1/2 lg:text-right">
+          <div className="text-center lg:text-right">
+            <div className="text-sm text-purple-400 font-semibold mb-1">REVOLUTIONARY</div>
+            <div className="text-gray-300">The first AI that pays users to use it</div>
+          </div>
+        </div>
+        
+        <div className="flex-shrink-0">
+          <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-black font-bold text-xl">
+            4
+          </div>
+        </div>
+        
+        <div className="lg:w-1/2">
+          <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-6 relative">
+            <div className="absolute -top-3 -right-3 bg-purple-500 text-black px-2 py-1 rounded-full text-xs font-bold">
+              VISION
+            </div>
+            <h3 className="text-xl font-bold text-purple-400 mb-3">
+              🤖 Phase 4: AI Revolution
+            </h3>
+            <div className="text-sm text-gray-300 space-y-2">
+              <div>🎯 Train custom LLM with collected prompts</div>
+              <div>🎯 AI that rewards users for conversations</div>
+              <div>🎯 Community-owned AI vs corporate monopolies</div>
+              <div>🎯 Global disruption of AI market</div>
+              <div>🎯 <strong className="text-purple-400">World's first profitable AI for users</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Bottom Vision Statement */}
+  <div className="mt-12 text-center">
+    <div className="bg-gradient-to-r from-teal-500/10 to-purple-500/10 border border-teal-500/20 rounded-xl p-6">
+      <h4 className="text-lg font-bold text-white mb-2">
+        💡 The Big Picture
+      </h4>
+      <p className="text-gray-300 max-w-3xl mx-auto">
+        While others charge $20/month for AI, we're building the first AI that <strong className="text-teal-400">pays users</strong> to use it. 
+        Community ownership, transparent development, and sustainable token economics - 
+        this is the future of AI.
+      </p>
+    </div>
+  </div>
+</div>
           </div>
         )}
 
