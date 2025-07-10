@@ -949,12 +949,12 @@ const validateReferralCode = async () => {
     {!isConnected ? (
       <button
         onClick={connectWallet}
-        className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-semibold py-2 px-4 lg:px-6 rounded-full transition-all duration-200 transform hover:scale-105 shadow-lg text-xs lg:text-sm"
+        className="hidden bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-semibold py-2 px-4 lg:px-6 rounded-full transition-all duration-200 transform hover:scale-105 shadow-lg text-xs lg:text-sm"
       >
         Connect Wallet
       </button>
     ) : (
-      <div className="flex items-center space-x-2">
+      <div className="hidden flex items-center space-x-2">
         <div className="text-xs lg:text-sm text-teal-400 font-mono">
           {account.slice(0, 4)}...{account.slice(-4)}
         </div>
@@ -1507,7 +1507,7 @@ const validateReferralCode = async () => {
       <p className="text-gray-300 mb-4 text-sm">
         Enter a friend's referral code and they'll earn 10% of your POOL rewards!
       </p>
-      <div className="flex space-x-3">
+      <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
         <input
           type="text"
           placeholder="Enter referral code (optional)"
@@ -1518,36 +1518,7 @@ const validateReferralCode = async () => {
         <button 
           onClick={validateReferralCode}
           disabled={!referralCode.trim()}
-          className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg transition-colors"
-        >
-          Validate
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-{!displayIsConnected && (
-  <div className="mb-8">
-    <div className="bg-blue-500/10 border border-blue-400/30 rounded-xl p-6">
-      <h3 className="text-lg font-bold text-blue-400 mb-4 flex items-center">
-        <span className="mr-2">🎁</span>
-        Have a Referral Code?
-      </h3>
-      <p className="text-gray-300 mb-4 text-sm">
-        Enter a friend's referral code and they'll earn 10% of your POOL rewards!
-      </p>
-      <div className="flex space-x-3">
-        <input
-          type="text"
-          placeholder="Enter referral code (optional)"
-          value={referralCode}
-          onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-          className="flex-1 px-4 py-3 bg-slate-700/50 border border-blue-500/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
-        />
-        <button 
-          onClick={validateReferralCode}
-          disabled={!referralCode.trim()}
-          className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg transition-colors"
+          className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg transition-colors whitespace-nowrap"
         >
           Validate
         </button>
@@ -1565,11 +1536,11 @@ const validateReferralCode = async () => {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                   <button
                     onClick={connectWallet}
-                    className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-bold py-4 px-8 rounded-full transition-all duration-200 transform hover:scale-105 shadow-xl"
+                    className="hidden bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-bold py-4 px-8 rounded-full transition-all duration-200 transform hover:scale-105 shadow-xl"
                   >
                     Connect with MetaMask 🦊
                   </button>
-                  <span className="text-gray-500">or</span>
+                  <span className="hidden text-gray-500">or</span>
                   <WagmiConnectButton />
                 </div>
               </div>
