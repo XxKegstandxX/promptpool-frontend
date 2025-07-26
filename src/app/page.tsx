@@ -11,10 +11,12 @@ import {
   useContractBalance,
   useRewardEstimate,
   useSubmitPrompt,
-  useTierInfo
+  useTierInfo,
+  useUserSubmissions
 } from '../hooks/usePromptPool'
 import { uploadPromptToIPFS, getIPFSConfig } from '../lib/ipfs'
 import { ReferralService } from '../lib/supabase'
+import EnhancedAIWithRewards from '../components/EnhancedAIWithRewards'
 
 // Import the floating particles component
 const FloatingParticles = () => {
@@ -102,22 +104,12 @@ const QuickHelpModal = ({
       content: (
         <div className="space-y-4">
           <div className="bg-blue-500/10 border border-blue-400/30 rounded-lg p-4">
-            <h4 className="text-blue-400 font-semibold mb-2">Option 1: Web3Modal (Recommended)</h4>
+            <h4 className="text-blue-400 font-semibold mb-2">Web3Modal (Recommended)</h4>
             <ol className="text-sm text-gray-300 space-y-2 list-decimal list-inside">
               <li>Click the purple "Connect Wallet" button</li>
               <li>Choose from 300+ supported wallets</li>
               <li>Follow the prompts in your wallet app</li>
               <li>Approve the connection</li>
-            </ol>
-          </div>
-          
-          <div className="bg-teal-500/10 border border-teal-400/30 rounded-lg p-4">
-            <h4 className="text-teal-400 font-semibold mb-2">Option 2: MetaMask Direct</h4>
-            <ol className="text-sm text-gray-300 space-y-2 list-decimal list-inside">
-              <li>Install MetaMask browser extension or mobile app</li>
-              <li>Click the green "Connect with MetaMask" button</li>
-              <li>Approve the connection in MetaMask</li>
-              <li>Switch to Polygon network if prompted</li>
             </ol>
           </div>
 
@@ -141,249 +133,271 @@ const QuickHelpModal = ({
         </div>
       )
     },
-    rewards: {
-      title: "💰 How Rewards Work",
-      content: (
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-orange-500/10 border border-orange-400/30 rounded-lg p-4">
-              <div className="flex items-center mb-2">
-                <span className="text-2xl mr-2">🥉</span>
-                <h4 className="text-orange-400 font-semibold">Bronze (5-10 POOL)</h4>
-              </div>
-              <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
-                <li>Automatic approval</li>
-                <li>Instant payment</li>
-                <li>Basic quality prompts</li>
-                <li>Perfect for beginners</li>
-              </ul>
-            </div>
-
-            <div className="bg-gray-400/10 border border-gray-400/30 rounded-lg p-4">
-              <div className="flex items-center mb-2">
-                <span className="text-2xl mr-2">🥈</span>
-                <h4 className="text-gray-300 font-semibold">Silver (15-25 POOL)</h4>
-              </div>
-              <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
-                <li>Automatic approval</li>
-                <li>Instant payment</li>
-                <li>Good quality required</li>
-                <li>Higher rewards</li>
-              </ul>
-            </div>
-
-            <div className="bg-yellow-500/10 border border-yellow-400/30 rounded-lg p-4">
-              <div className="flex items-center mb-2">
-                <span className="text-2xl mr-2">🥇</span>
-                <h4 className="text-yellow-400 font-semibold">Gold (30-50 POOL)</h4>
-              </div>
-              <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
-                <li>Manual review</li>
-                <li>24-48h approval</li>
-                <li>High quality prompts</li>
-                <li>Expert evaluation</li>
-              </ul>
-            </div>
-
-            <div className="bg-purple-500/10 border border-purple-400/30 rounded-lg p-4">
-              <div className="flex items-center mb-2">
-                <span className="text-2xl mr-2">💎</span>
-                <h4 className="text-purple-400 font-semibold">Platinum (75-100 POOL)</h4>
-              </div>
-              <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
-                <li>Expert panel review</li>
-                <li>2-7 day approval</li>
-                <li>Exceptional quality</li>
-                <li>Highest rewards</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="bg-teal-500/10 border border-teal-400/30 rounded-lg p-4">
-            <h4 className="text-teal-400 font-semibold mb-2">🎯 How Tiers Are Determined</h4>
-            <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
-              <li><strong>Length:</strong> Longer, detailed prompts score higher</li>
-              <li><strong>Originality:</strong> Unique prompts get better tiers</li>
-              <li><strong>Category:</strong> Technical prompts often score higher</li>
-              <li><strong>User Reputation:</strong> Better history = higher tiers</li>
-              <li><strong>Training Value:</strong> How useful for AI training</li>
-            </ul>
-          </div>
-
-          <div className="bg-green-500/10 border border-green-400/30 rounded-lg p-4">
-            <h4 className="text-green-400 font-semibold mb-2">🚀 Pro Tips</h4>
-            <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
-              <li>Start with Bronze/Silver to build reputation</li>
-              <li>Detailed prompts (100+ words) perform better</li>
-              <li>Include context and examples in your prompts</li>
-              <li>Consistent quality submissions increase your tier over time</li>
-            </ul>
-          </div>
-        </div>
-      )
-    },
-    prompts: {
-      title: "📝 What Makes a Good Prompt",
+    
+    'ai-chat': {
+      title: "🤖 Maximizing Your AI Chat Earnings",
       content: (
         <div className="space-y-4">
           <div className="bg-green-500/10 border border-green-400/30 rounded-lg p-4">
-            <h4 className="text-green-400 font-semibold mb-2">✅ Good Prompt Characteristics</h4>
+            <h4 className="text-green-400 font-semibold mb-2">💡 How to Earn More POOL</h4>
             <ul className="text-sm text-gray-300 space-y-2 list-disc list-inside">
-              <li><strong>Clear and Specific:</strong> Exactly what you want the AI to do</li>
-              <li><strong>Detailed Context:</strong> Background information and constraints</li>
-              <li><strong>Examples Included:</strong> Show the AI what good output looks like</li>
-              <li><strong>Proper Length:</strong> Minimum 50 words, ideally 100-300 words</li>
-              <li><strong>Well-Structured:</strong> Organized with clear sections</li>
-              <li><strong>Original Content:</strong> Your own creative work, not copied</li>
-            </ul>
-          </div>
-
-          <div className="bg-blue-500/10 border border-blue-400/30 rounded-lg p-4">
-            <h4 className="text-blue-400 font-semibold mb-2">💎 Example: High-Quality Prompt</h4>
-            <div className="bg-slate-800/50 rounded p-3 text-sm text-gray-300 font-mono">
-              <p className="mb-2"><strong>Title:</strong> "Creative Writing Assistant for Sci-Fi Stories"</p>
-              <p className="mb-2"><strong>Category:</strong> Creative Writing</p>
-              <p><strong>Content:</strong> "You are a creative writing assistant specializing in science fiction. Help writers develop compelling sci-fi stories by providing: 1) Unique plot concepts that haven't been overused, 2) Scientifically plausible explanations for futuristic technology, 3) Character development suggestions for diverse casts. When suggesting plots, always include a brief scientific explanation for key technologies. Focus on stories that explore human nature through technological advancement. Example output format: 'Plot: [concept] | Science: [explanation] | Characters: [suggestions]'"</p>
-            </div>
-          </div>
-
-          <div className="bg-red-500/10 border border-red-400/30 rounded-lg p-4">
-            <h4 className="text-red-400 font-semibold mb-2">❌ Avoid These Mistakes</h4>
-            <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
-              <li>Too vague: "Help me write something"</li>
-              <li>Too short: Single sentence prompts</li>
-              <li>Copied content: Prompts found elsewhere online</li>
-              <li>No context: Jumping straight to requests</li>
-              <li>Poor grammar: Makes prompts hard to understand</li>
-              <li>Inappropriate content: Keep it professional and helpful</li>
-            </ul>
-          </div>
-
-          <div className="bg-yellow-500/10 border border-yellow-400/30 rounded-lg p-4">
-            <h4 className="text-yellow-400 font-semibold mb-2">🎯 Categories That Perform Well</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-300">
-              <div>
-                <p><strong>Technical/Programming:</strong></p>
-                <ul className="list-disc list-inside text-xs space-y-1 mt-1">
-                  <li>Code generation prompts</li>
-                  <li>Debugging assistance</li>
-                  <li>Architecture explanations</li>
-                </ul>
-              </div>
-              <div>
-                <p><strong>Educational:</strong></p>
-                <ul className="list-disc list-inside text-xs space-y-1 mt-1">
-                  <li>Step-by-step tutorials</li>
-                  <li>Concept explanations</li>
-                  <li>Learning activities</li>
-                </ul>
-              </div>
-              <div>
-                <p><strong>Creative Writing:</strong></p>
-                <ul className="list-disc list-inside text-xs space-y-1 mt-1">
-                  <li>Story development</li>
-                  <li>Character creation</li>
-                  <li>World building</li>
-                </ul>
-              </div>
-              <div>
-                <p><strong>Analytical:</strong></p>
-                <ul className="list-disc list-inside text-xs space-y-1 mt-1">
-                  <li>Data analysis tasks</li>
-                  <li>Research methodologies</li>
-                  <li>Problem-solving frameworks</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    ipfs: {
-      title: "🌐 What is IPFS Storage",
-      content: (
-        <div className="space-y-4">
-          <div className="bg-blue-500/10 border border-blue-400/30 rounded-lg p-4">
-            <h4 className="text-blue-400 font-semibold mb-2">🌍 IPFS Explained Simply</h4>
-            <p className="text-sm text-gray-300 mb-2">
-              IPFS (InterPlanetary File System) is like a global, permanent filing cabinet that no single company controls. 
-              When you submit a prompt, it gets stored across multiple computers worldwide, making it:
-            </p>
-            <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
-              <li><strong>Permanent:</strong> Your prompts can never be deleted or lost</li>
-              <li><strong>Decentralized:</strong> No single point of failure</li>
-              <li><strong>Verifiable:</strong> Each file gets a unique, unchangeable fingerprint</li>
-              <li><strong>Accessible:</strong> Available from anywhere in the world</li>
+              <li><strong>Longer conversations:</strong> Each message earns 0.15+ POOL tokens</li>
+              <li><strong>Quality interactions:</strong> Thoughtful questions and detailed discussions earn more</li>
+              <li><strong>Regular usage:</strong> Consistent chatting builds up claimable rewards</li>
+              <li><strong>Wait for optimal timing:</strong> Our system tells you when to claim for maximum profit</li>
             </ul>
           </div>
 
           <div className="bg-teal-500/10 border border-teal-400/30 rounded-lg p-4">
-            <h4 className="text-teal-400 font-semibold mb-2">🔒 Why We Use IPFS</h4>
+            <h4 className="text-teal-400 font-semibold mb-2">🎯 Real Earning Examples</h4>
+            <div className="space-y-3 text-sm">
+              <div className="bg-slate-800/50 rounded p-3">
+                <p className="text-white font-medium">Short conversation (3 messages):</p>
+                <p className="text-gray-300">Earn: ~0.50 POOL | Gas: $0.11 | Profit: ~$0.01</p>
+              </div>
+              <div className="bg-slate-800/50 rounded p-3">
+                <p className="text-white font-medium">Medium conversation (8 messages):</p>
+                <p className="text-gray-300">Earn: ~1.5 POOL | Gas: $0.11 | Profit: ~$0.26</p>
+              </div>
+              <div className="bg-slate-800/50 rounded p-3">
+                <p className="text-white font-medium">Long conversation (15+ messages):</p>
+                <p className="text-gray-300">Earn: ~3.0+ POOL | Gas: $0.11 | Profit: ~$0.64+</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-blue-500/10 border border-blue-400/30 rounded-lg p-4">
+            <h4 className="text-blue-400 font-semibold mb-2">🤖 Best Topics for AI Chat</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-300">
               <div>
-                <p><strong>vs Traditional Servers:</strong></p>
+                <p><strong>Learning & Education:</strong></p>
                 <ul className="list-disc list-inside text-xs space-y-1 mt-1">
-                  <li>✅ Can't be shut down</li>
-                  <li>✅ No censorship risk</li>
-                  <li>✅ Global availability</li>
-                  <li>✅ Lower costs</li>
+                  <li>Ask for explanations</li>
+                  <li>Request tutorials</li>
+                  <li>Discuss concepts</li>
                 </ul>
               </div>
               <div>
-                <p><strong>vs Cloud Storage:</strong></p>
+                <p><strong>Problem Solving:</strong></p>
                 <ul className="list-disc list-inside text-xs space-y-1 mt-1">
-                  <li>✅ You own your data</li>
-                  <li>✅ No monthly fees</li>
-                  <li>✅ Cannot be deleted</li>
-                  <li>✅ Cryptographically verified</li>
+                  <li>Code debugging help</li>
+                  <li>Project planning</li>
+                  <li>Creative brainstorming</li>
+                </ul>
+              </div>
+              <div>
+                <p><strong>Creative Projects:</strong></p>
+                <ul className="list-disc list-inside text-xs space-y-1 mt-1">
+                  <li>Writing assistance</li>
+                  <li>Idea generation</li>
+                  <li>Content planning</li>
+                </ul>
+              </div>
+              <div>
+                <p><strong>General Discussion:</strong></p>
+                <ul className="list-disc list-inside text-xs space-y-1 mt-1">
+                  <li>Current events</li>
+                  <li>Technology trends</li>
+                  <li>Philosophical topics</li>
                 </ul>
               </div>
             </div>
           </div>
 
-          <div className="bg-purple-500/10 border border-purple-400/30 rounded-lg p-4">
-            <h4 className="text-purple-400 font-semibold mb-2">🔗 Your IPFS Hash</h4>
-            <p className="text-sm text-gray-300 mb-2">
-              When you submit a prompt, you get an IPFS hash that looks like: 
-              <code className="bg-slate-800 px-2 py-1 rounded text-teal-400 ml-1">QmX7x8x9x...</code>
-            </p>
-            <p className="text-sm text-gray-300 mb-2">This hash is like a permanent address for your content. You can:</p>
+          <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+            <h4 className="text-purple-400 font-semibold mb-2">🎮 Pro Tips</h4>
             <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
-              <li>View it on any IPFS gateway</li>
-              <li>Share it with others</li>
-              <li>Prove you created the content</li>
-              <li>Access it forever</li>
+              <li>Ask follow-up questions to extend conversations naturally</li>
+              <li>Request examples or elaboration when AI gives brief answers</li>
+              <li>Chat about topics you're genuinely interested in - it shows!</li>
+              <li>Use the AI for real work/learning - you get paid to be productive!</li>
+              <li>Check the gas efficiency indicator before claiming rewards</li>
+            </ul>
+          </div>
+        </div>
+      )
+    },
+
+    'gas-optimization': {
+      title: "⚡ Understanding Gas Optimization",
+      content: (
+        <div className="space-y-4">
+          <div className="bg-yellow-500/10 border border-yellow-400/30 rounded-lg p-4">
+            <h4 className="text-yellow-400 font-semibold mb-2">🎯 How Our Smart System Works</h4>
+            <p className="text-sm text-gray-300 mb-3">
+              Our revolutionary gas optimization system calculates the perfect time to claim your rewards, ensuring you 
+              <strong className="text-yellow-400"> always profit</strong> from every transaction.
+            </p>
+            <div className="bg-slate-800/50 rounded p-3">
+              <p className="text-gray-300 text-sm">
+                <strong className="text-yellow-400">Formula:</strong> Efficiency = (POOL Earned × Current Price) ÷ Gas Cost
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+            <h4 className="text-red-400 font-semibold mb-2 flex items-center">
+              🔴 Low Efficiency (1.0x - 2.5x)
+            </h4>
+            <p className="text-sm text-gray-300 mb-2">You'll break even but minimal profit</p>
+            <div className="bg-slate-800/50 rounded p-3 text-sm">
+              <p className="text-red-300">Example: 0.5 POOL earned (~$0.12) vs $0.11 gas = $0.01 profit</p>
+              <p className="text-gray-400 mt-1">System suggests: "Chat 3 more messages for better efficiency"</p>
+            </div>
+          </div>
+
+          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+            <h4 className="text-yellow-400 font-semibold mb-2 flex items-center">
+              🟡 Good Efficiency (2.5x - 4.5x)
+            </h4>
+            <p className="text-sm text-gray-300 mb-2">Decent profit - you can claim now or wait for optimal</p>
+            <div className="bg-slate-800/50 rounded p-3 text-sm">
+              <p className="text-yellow-300">Example: 1.2 POOL earned (~$0.30) vs $0.11 gas = $0.19 profit</p>
+              <p className="text-gray-400 mt-1">System suggests: "Good time to claim, or chat 2 more for optimal"</p>
+            </div>
+          </div>
+
+          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+            <h4 className="text-green-400 font-semibold mb-2 flex items-center">
+              🟢 Optimal Efficiency (4.5x+)
+            </h4>
+            <p className="text-sm text-gray-300 mb-2">Maximum profitability - perfect time to claim!</p>
+            <div className="bg-slate-800/50 rounded p-3 text-sm">
+              <p className="text-green-300">Example: 2.5+ POOL earned (~$0.62+) vs $0.11 gas = $0.51+ profit</p>
+              <p className="text-gray-400 mt-1">System suggests: "Optimal time to claim rewards!"</p>
+            </div>
+          </div>
+
+          <div className="bg-teal-500/10 border border-teal-500/30 rounded-lg p-4">
+            <h4 className="text-teal-400 font-semibold mb-2">🔒 Safety Features</h4>
+            <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
+              <li><strong>Profit guarantee:</strong> System won't let you claim unless you'll profit</li>
+              <li><strong>Real-time calculation:</strong> Live efficiency updates as you chat</li>
+              <li><strong>Smart suggestions:</strong> Clear guidance on when to claim or keep chatting</li>
+              <li><strong>Gas price monitoring:</strong> Adjusts recommendations based on current network fees</li>
+              <li><strong>Transparent costs:</strong> Always shows exact gas cost and expected profit</li>
             </ul>
           </div>
 
-          <div className="bg-green-500/10 border border-green-400/30 rounded-lg p-4">
-            <h4 className="text-green-400 font-semibold mb-2">⚡ Current Status</h4>
-            <div className={`flex items-center space-x-2 mb-2 ${ipfsConfig.isDemo ? 'text-yellow-400' : 'text-green-400'}`}>
-              <div className="text-lg">{ipfsConfig.isDemo ? '🧪' : '🌐'}</div>
-              <span className="font-semibold">{ipfsConfig.isDemo ? 'Demo Mode' : 'Production Mode'}</span>
-            </div>
+          <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+            <h4 className="text-purple-400 font-semibold mb-2">💡 Why This Matters</h4>
             <p className="text-sm text-gray-300">
-              {ipfsConfig.isDemo 
-                ? 'Currently using simulated IPFS for testing. Your prompts are saved locally but will be moved to real IPFS in production.'
-                : 'Your prompts are being stored on real IPFS via Pinata, making them permanently accessible worldwide.'
-              }
+              Traditional crypto apps often let users lose money on transactions. Our system is revolutionary because it 
+              <strong className="text-purple-400"> guarantees you always profit</strong>. We've solved the "micro-transaction problem" 
+              that has plagued crypto adoption for years!
             </p>
+          </div>
+        </div>
+      )
+    },
+
+    'crypto-basics': {
+      title: "🎓 Crypto Basics for Complete Beginners",
+      content: (
+        <div className="space-y-4">
+          <div className="bg-blue-500/10 border border-blue-400/30 rounded-lg p-4">
+            <h4 className="text-blue-400 font-semibold mb-2">🏦 What is a Crypto Wallet?</h4>
+            <p className="text-sm text-gray-300 mb-3">
+              Think of a crypto wallet like a digital bank account, but <strong>you</strong> control it completely. 
+              No bank, no government, no company can freeze or control your wallet.
+            </p>
+            <div className="bg-slate-800/50 rounded p-3">
+              <p className="text-gray-300 text-sm">
+                <strong className="text-blue-400">Your wallet has:</strong> A unique address (like an account number) 
+                and private keys (like your password). Never share your private keys with anyone!
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-green-500/10 border border-green-400/30 rounded-lg p-4">
+            <h4 className="text-green-400 font-semibold mb-2">🪙 What are Tokens?</h4>
+            <p className="text-sm text-gray-300 mb-3">
+              Tokens are like digital coins, but each type serves different purposes:
+            </p>
+            <div className="space-y-2 text-sm">
+              <div className="bg-slate-800/50 rounded p-3">
+                <p className="text-green-300 font-medium">POOL Tokens (PromptPool's currency):</p>
+                <p className="text-gray-300">What you earn for chatting with AI. Can be traded for real money!</p>
+              </div>
+              <div className="bg-slate-800/50 rounded p-3">
+                <p className="text-blue-300 font-medium">POL Tokens (Polygon's gas currency):</p>
+                <p className="text-gray-300">Used to pay tiny fees for transactions. Like digital stamps!</p>
+              </div>
+              <div className="bg-slate-800/50 rounded p-3">
+                <p className="text-purple-300 font-medium">Other tokens:</p>
+                <p className="text-gray-300">USDC (digital dollars), ETH (Ethereum), BTC (Bitcoin), etc.</p>
+              </div>
+            </div>
           </div>
 
           <div className="bg-orange-500/10 border border-orange-400/30 rounded-lg p-4">
-            <h4 className="text-orange-400 font-semibold mb-2">🔍 Learn More</h4>
-            <p className="text-sm text-gray-300 mb-2">Want to explore IPFS further?</p>
-            <div className="flex flex-wrap gap-2">
-              <a href="https://ipfs.io/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-white text-xs bg-slate-800 px-3 py-1 rounded transition-colors">
-                IPFS.io →
-              </a>
-              <a href="https://docs.ipfs.io/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-white text-xs bg-slate-800 px-3 py-1 rounded transition-colors">
-                Documentation →
-              </a>
-              <a href="https://pinata.cloud/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-white text-xs bg-slate-800 px-3 py-1 rounded transition-colors">
-                Pinata →
-              </a>
+            <h4 className="text-orange-400 font-semibold mb-2">⛓️ What is Blockchain?</h4>
+            <p className="text-sm text-gray-300 mb-3">
+              Imagine a digital ledger that's copied across thousands of computers worldwide. 
+              Every transaction is recorded permanently and can't be faked or deleted.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+              <div className="bg-slate-800/50 rounded p-3">
+                <p className="text-orange-300 font-medium">Benefits:</p>
+                <ul className="list-disc list-inside text-xs text-gray-300 mt-1">
+                  <li>No single point of failure</li>
+                  <li>Transparent and auditable</li>
+                  <li>Censorship resistant</li>
+                  <li>Global and accessible 24/7</li>
+                </ul>
+              </div>
+              <div className="bg-slate-800/50 rounded p-3">
+                <p className="text-orange-300 font-medium">Why Polygon?</p>
+                <ul className="list-disc list-inside text-xs text-gray-300 mt-1">
+                  <li>Super cheap transactions ($0.01-$0.50)</li>
+                  <li>Lightning fast (2-3 seconds)</li>
+                  <li>Environmentally friendly</li>
+                  <li>Same security as Ethereum</li>
+                </ul>
+              </div>
             </div>
+          </div>
+
+          <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+            <h4 className="text-purple-400 font-semibold mb-2">🚀 Why is This Revolutionary?</h4>
+            <div className="space-y-3 text-sm">
+              <div className="bg-slate-800/50 rounded p-3">
+                <p className="text-purple-300 font-medium">Traditional System:</p>
+                <p className="text-gray-300">Banks control your money → Take fees → Can freeze accounts → Limited hours</p>
+              </div>
+              <div className="bg-slate-800/50 rounded p-3">
+                <p className="text-purple-300 font-medium">Crypto System:</p>
+                <p className="text-gray-300">You control your money → Minimal fees → No one can freeze → Always available</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-teal-500/10 border border-teal-500/30 rounded-lg p-4">
+            <h4 className="text-teal-400 font-semibold mb-2">🛡️ Safety Tips for Beginners</h4>
+            <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
+              <li><strong>Never share your seed phrase:</strong> These 12-24 words are the keys to your wallet</li>
+              <li><strong>Start small:</strong> Begin with small amounts to learn how everything works</li>
+              <li><strong>Double-check addresses:</strong> Always verify wallet addresses before sending</li>
+              <li><strong>Use official apps:</strong> Download MetaMask from metamask.io, not random sites</li>
+              <li><strong>Keep backups:</strong> Write down your seed phrase and store it safely offline</li>
+              <li><strong>Ask questions:</strong> The crypto community is helpful - don't be afraid to ask!</li>
+            </ul>
+          </div>
+
+          <div className="bg-gradient-to-r from-teal-500/10 to-purple-500/10 border border-teal-500/20 rounded-lg p-4">
+            <h4 className="text-white font-semibold mb-2">🌟 Your PromptPool Journey</h4>
+            <p className="text-sm text-gray-300 mb-2">
+              The beautiful thing about PromptPool is you don't need to understand everything right away! 
+            </p>
+            <ol className="text-sm text-gray-300 space-y-1 list-decimal list-inside">
+              <li>Create a wallet (we'll guide you)</li>
+              <li>Get free gas tokens (we provide the link)</li>
+              <li>Connect and start chatting (earn real money!)</li>
+              <li>Learn more as you go (we're here to help)</li>
+            </ol>
+            <p className="text-sm text-teal-400 mt-3 font-medium">
+              Welcome to the future of finance - where users are rewarded, not exploited! 🚀
+            </p>
           </div>
         </div>
       )
@@ -430,7 +444,7 @@ const CONTRACT_ABI = [
   "function getRewardEstimate(uint256 promptLength, uint8 category, address user) external view returns (uint8 tier, uint256 rewardAmount)"
 ]
 
-type PageType = 'home' | 'how-it-works' | 'connect' | 'team' | 'contact'
+type PageType = 'home' | 'how-it-works' | 'connect' | 'pool-ai-chat' | 'team' | 'contact'
 
 // Type for user contributions
 interface UserContribution {
@@ -498,11 +512,20 @@ const [activeModal, setActiveModal] = useState<string | null>(null)
   // Wagmi hooks
   const { address, isConnected: isWagmiConnected } = usePromptPoolAccount()
   const { data: totalSubmissions } = useTotalSubmissions()
+  // 🔍 Add this debug:
+console.log('Total submissions from wagmi:', totalSubmissions?.toString())
   const { balance: contractBalance } = useContractBalance()
   const { userStats: wagmiUserStats } = useUserStats(address)
   const { estimatedReward } = useRewardEstimate(promptContent.length, category, address)
   const { submitPrompt, isSubmitting, isSuccess, hash, error } = useSubmitPrompt()
   const { getTierName, getTierColor } = useTierInfo()
+  const { userSubmissions } = useUserSubmissions(address)
+  // 🔍 Add these debug logs:
+console.log('Debug info:')
+console.log('- Address:', address)
+console.log('- Total submissions:', totalSubmissions?.toString())
+console.log('- User submissions:', userSubmissions)
+console.log('- User submissions length:', userSubmissions.length)
   
   // Toast notifications with removal functions
   const { addToast, removeToast, removeLoadingToasts } = useToast()
@@ -925,8 +948,18 @@ const validateReferralCode = async () => {
                 onClick={() => setCurrentPage('connect')}
                 className={`font-medium transition-colors ${currentPage === 'connect' ? 'text-teal-400' : 'text-gray-300 hover:text-teal-400'}`}
               >
-                Connect & Contribute
+                Getting Started
               </button>
+              
+              {/* Pool AI Chat Button - SEPARATE */}
+              <button 
+                onClick={() => setCurrentPage('pool-ai-chat')}
+                className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-semibold py-2 px-4 rounded-full transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center space-x-2"
+              >
+                <span>🤖</span>
+                <span>Chat & Earn</span>
+              </button>
+              
               <button 
                 onClick={() => setCurrentPage('team')}
                 className={`font-medium transition-colors ${currentPage === 'team' ? 'text-teal-400' : 'text-gray-300 hover:text-teal-400'}`}
@@ -988,17 +1021,25 @@ const validateReferralCode = async () => {
           {isMobileMenuOpen && (
             <div className="md:hidden border-t border-teal-500/20 bg-black/80 backdrop-blur-lg">
               <div className="px-2 pt-2 pb-3 space-y-1">
-                {['home', 'how-it-works', 'connect', 'team', 'contact'].map((page) => (
+                {['home', 'how-it-works', 'connect', 'pool-ai-chat', 'team', 'contact'].map((page) => (
                   <button
-                    key={page}
-                    onClick={() => {
-                      setCurrentPage(page as PageType)
-                      setIsMobileMenuOpen(false)
-                    }}
-                    className={`block px-3 py-2 text-base font-medium transition-colors ${currentPage === page ? 'text-teal-400' : 'text-gray-300 hover:text-teal-400'}`}
-                  >
-                    {page.charAt(0).toUpperCase() + page.slice(1).replace('-', ' ')}
-                  </button>
+  key={page}
+  onClick={() => {
+    setCurrentPage(page as PageType)
+    setIsMobileMenuOpen(false)
+  }}
+  className={`block px-3 py-2 text-base font-medium transition-colors flex items-center space-x-2 ${currentPage === page ? 'text-teal-400' : 'text-gray-300 hover:text-teal-400'}`}
+>
+  {page === 'pool-ai-chat' && <span>🤖</span>}
+  <span>
+    {page === 'pool-ai-chat' 
+      ? 'Pool AI Chat' 
+      : page === 'connect'
+  ? 'Getting Started'
+      : page.charAt(0).toUpperCase() + page.slice(1).replace('-', ' ')
+    }
+  </span>
+</button>
                 ))}
               </div>
             </div>
@@ -1011,29 +1052,29 @@ const validateReferralCode = async () => {
         {/* Home Page */}
         {currentPage === 'home' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {/* Hero Section */}
+            {/* Hero Section - UPDATED */}
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white via-teal-200 to-cyan-400 bg-clip-text text-transparent leading-tight">
-                Revolutionizing AI Training<br />
-                <span className="text-3xl md:text-5xl">Through Crypto Rewards</span>
+                World's First AI That<br />
+                <span className="text-3xl md:text-5xl">Pays Users to Chat</span>
               </h2>
               <p className="text-xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
-                Submit high-quality prompts and earn POOL tokens instantly. No mining hardware needed - just your creativity and knowledge. Join the world&apos;s first &quot;Proof of Contribution&quot; ecosystem.
+                Chat with Pool AI and earn POOL tokens for every conversation. No monthly fees, no subscriptions - just get paid to use revolutionary AI. Building a community to get a penny for our thoughts!
               </p>
               
               <button 
-                onClick={() => setCurrentPage('connect')}
+                onClick={() => setCurrentPage('pool-ai-chat')}
                 className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-bold py-4 px-8 rounded-full transition-all duration-200 transform hover:scale-105 shadow-xl mb-12"
               >
-                Start Contributing 🚀
+                Start Chatting & Earning 🤖
               </button>
               
-              {/* Enhanced Live Stats */}
+              {/* Enhanced Live Stats - UPDATED */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
                 <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-6 transform hover:scale-105 transition-all duration-200">
-                  <div className="text-3xl font-bold text-teal-400 mb-2">{displayTotalSubmissions}</div>
-                  <div className="text-sm text-gray-400">Total Prompts</div>
-                  <div className="text-xs text-teal-300 mt-1">📈 Live Data</div>
+                  <div className="text-3xl font-bold text-teal-400 mb-2">LIVE</div>
+                  <div className="text-sm text-gray-400">AI Chat System</div>
+                  <div className="text-xs text-teal-300 mt-1">🤖 Llama 3.1 8B</div>
                 </div>
                 <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-6 transform hover:scale-105 transition-all duration-200">
                   <div className="text-3xl font-bold text-green-400 mb-2">{parseFloat(displayContractBalance).toFixed(0)}</div>
@@ -1041,18 +1082,14 @@ const validateReferralCode = async () => {
                   <div className="text-xs text-green-300 mt-1">💰 Ready to Pay</div>
                 </div>
                 <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-6 transform hover:scale-105 transition-all duration-200">
-                  <div className="text-3xl font-bold text-yellow-400 mb-2">5-100</div>
-                  <div className="text-sm text-gray-400">POOL Range</div>
-                  <div className="text-xs text-yellow-300 mt-1">🎯 Per Prompt</div>
+                  <div className="text-3xl font-bold text-yellow-400 mb-2">0.5s</div>
+                  <div className="text-sm text-gray-400">Response Time</div>
+                  <div className="text-xs text-yellow-300 mt-1">⚡ Lightning Fast</div>
                 </div>
                 <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-6 transform hover:scale-105 transition-all duration-200">
-                  <div className="text-3xl font-bold text-purple-400 mb-2">
-                    {ipfsConfig.isDemo ? '🧪' : '🌍'}
-                  </div>
-                  <div className="text-sm text-gray-400">
-                    {ipfsConfig.isDemo ? 'Demo Mode' : 'Production'}
-                  </div>
-                  <div className="text-xs text-purple-300 mt-1">♻️ IPFS Ready</div>
+                  <div className="text-3xl font-bold text-purple-400 mb-2">99%</div>
+                  <div className="text-sm text-gray-400">Profit Margin</div>
+                  <div className="text-xs text-purple-300 mt-1">💎 Users Always Win</div>
                 </div>
               </div>
             </div>
@@ -1061,12 +1098,12 @@ const validateReferralCode = async () => {
             {displayIsConnected && displayUserStats && (
               <div className="bg-gradient-to-r from-slate-800/50 to-slate-700/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 mb-16">
                 <h3 className="text-2xl font-bold text-white mb-6 text-center">
-                  Welcome Back, Contributor! 👋
+                  Welcome Back, AI Pioneer! 👋
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-teal-400">{displayUserStats.totalSubmissions}</div>
-                    <div className="text-sm text-gray-400">Prompts Submitted</div>
+                    <div className="text-sm text-gray-400">Total Contributions</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-400">{displayUserStats.approvedSubmissions}</div>
@@ -1100,760 +1137,883 @@ const validateReferralCode = async () => {
               </div>
             )}
 
-            {/* Features Section */}
+            {/* Features Section - UPDATED */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
               <div className="bg-slate-800/30 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 text-center transform hover:scale-105 transition-all duration-300">
+                <div className="text-4xl mb-4">🤖</div>
+                <h3 className="text-xl font-bold text-white mb-4">Real AI Chat</h3>
+                <p className="text-gray-400">Chat with Llama 3.1 8B and earn POOL tokens for every conversation. Sub-second responses with contextual memory.</p>
+              </div>
+              <div className="bg-slate-800/30 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 text-center transform hover:scale-105 transition-all duration-300">
                 <div className="text-4xl mb-4">⚡</div>
-                <h3 className="text-xl font-bold text-white mb-4">Instant Rewards</h3>
-                <p className="text-gray-400">Bronze and Silver tier prompts get approved and paid automatically within seconds.</p>
+                <h3 className="text-xl font-bold text-white mb-4">Smart Gas Optimization</h3>
+                <p className="text-gray-400">Real-time efficiency tracking guides you to optimal claiming windows for maximum profitability.</p>
               </div>
               <div className="bg-slate-800/30 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 text-center transform hover:scale-105 transition-all duration-300">
-                <div className="text-4xl mb-4">🌐</div>
-                <h3 className="text-xl font-bold text-white mb-4">IPFS Storage</h3>
-                <p className="text-gray-400">All prompts stored on IPFS for permanent, decentralized access. No single point of failure.</p>
-              </div>
-              <div className="bg-slate-800/30 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 text-center transform hover:scale-105 transition-all duration-300">
-                <div className="text-4xl mb-4">🔗</div>
-                <h3 className="text-xl font-bold text-white mb-4">Multi-Wallet Support</h3>
-                <p className="text-gray-400">Connect with MetaMask, WalletConnect, Coinbase Wallet, and more through our Web3Modal integration.</p>
+                <div className="text-4xl mb-4">💰</div>
+                <h3 className="text-xl font-bold text-white mb-4">Revolutionary Economics</h3>
+                <p className="text-gray-400">First AI that pays users instead of charging them. Earn more than you spend on gas - guaranteed profitability.</p>
               </div>
             </div>
 
-            {/* Strategic Roadmap Section - Updated */}
-<div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 mb-16">
-  <div className="text-center mb-8">
-    <h2 className="text-3xl font-bold text-white mb-4">Strategic Roadmap</h2>
-    <p className="text-gray-300 max-w-2xl mx-auto">
-      Building the world's first AI that <strong className="text-teal-400">pays users to use it</strong> - 
-      a community-owned alternative to corporate AI monopolies
-    </p>
-  </div>
+            {/* Strategic Roadmap Section - COMPLETELY UPDATED */}
+            <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 mb-16">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-white mb-4">Revolutionary Progress</h2>
+                <p className="text-gray-300 max-w-2xl mx-auto">
+                  From concept to reality: We've successfully built and launched the world's first AI that <strong className="text-teal-400">pays users to chat</strong> - 
+                  proving that community-owned AI is the future
+                </p>
+              </div>
 
-  {/* Timeline with Connected Flow */}
-  <div className="relative">
-    {/* Connection Line */}
-    <div className="absolute top-20 left-1/2 transform -translate-x-1/2 w-0.5 h-96 bg-gradient-to-b from-green-400 via-teal-400 to-purple-400 opacity-30 hidden lg:block"></div>
-    
-    <div className="space-y-8">
-      {/* Phase 1: Foundation - COMPLETE */}
-      <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-4 lg:space-y-0 lg:space-x-8">
-        <div className="lg:w-1/2 lg:text-right">
-          <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-6 relative">
-            <div className="absolute -top-3 -right-3 bg-green-500 text-black px-2 py-1 rounded-full text-xs font-bold">
-              COMPLETE
-            </div>
-            <h3 className="text-xl font-bold text-green-400 mb-3">
-              🏗️ Phase 1: Foundation
-            </h3>
-            <div className="text-sm text-gray-300 space-y-2">
-              <div>✅ Production DApp on Polygon mainnet</div>
-              <div>✅ Smart contract with real POOL rewards</div>
-              <div>✅ Secure IPFS storage via Pinata</div>
-              <div>✅ Professional UI/UX with mobile support</div>
-              <div>✅ Dual wallet integration (Web3Modal + MetaMask)</div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="flex-shrink-0">
-          <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold text-xl">
-            1
-          </div>
-        </div>
-        
-        <div className="lg:w-1/2">
-          <div className="text-center lg:text-left">
-            <div className="text-sm text-green-400 font-semibold mb-1">COMPLETED</div>
-            <div className="text-gray-300">Solid foundation with real users earning POOL tokens</div>
-          </div>
-        </div>
-      </div>
+              {/* Timeline with Connected Flow */}
+              <div className="relative">
+                {/* Connection Line */}
+                <div className="absolute top-20 left-1/2 transform -translate-x-1/2 w-0.5 h-96 bg-gradient-to-b from-green-400 via-teal-400 to-purple-400 opacity-30 hidden lg:block"></div>
+                
+                <div className="space-y-8">
+                  {/* Phase 1: AI Foundation - COMPLETED */}
+                  <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-4 lg:space-y-0 lg:space-x-8">
+                    <div className="lg:w-1/2 lg:text-right">
+                      <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-6 relative">
+                        <div className="absolute -top-3 -right-3 bg-green-500 text-black px-2 py-1 rounded-full text-xs font-bold">
+                          COMPLETED
+                        </div>
+                        <h3 className="text-xl font-bold text-green-400 mb-3">
+                          🤖 Phase 1: AI Foundation
+                        </h3>
+                        <div className="text-sm text-gray-300 space-y-2">
+                          <div>✅ Real Llama 3.1 8B integration via Groq</div>
+                          <div>✅ Sub-second AI responses with context</div>
+                          <div>✅ Smart gas optimization system</div>
+                          <div>✅ Real-time POOL earnings tracking</div>
+                          <div>✅ IPFS conversation data collection</div>
+                          <div>✅ Enhanced Contract V2 with 25K POOL loaded</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold text-xl">
+                        1
+                      </div>
+                    </div>
+                    
+                    <div className="lg:w-1/2">
+                      <div className="text-center lg:text-left">
+                        <div className="text-sm text-green-400 font-semibold mb-1">REVOLUTIONARY SUCCESS</div>
+                        <div className="text-gray-300">World's first AI that pays users is LIVE and working</div>
+                      </div>
+                    </div>
+                  </div>
 
-      {/* Phase 2: Viral Growth - IN PROGRESS */}
-      <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-4 lg:space-y-0 lg:space-x-8">
-        <div className="lg:w-1/2 lg:text-right">
-          <div className="text-center lg:text-right">
-            <div className="text-sm text-teal-400 font-semibold mb-1">IN PROGRESS</div>
-            <div className="text-gray-300">Building viral referral engine for exponential growth</div>
-          </div>
-        </div>
-        
-        <div className="flex-shrink-0">
-          <div className="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center text-black font-bold text-xl relative">
-            2
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-teal-400 rounded-full animate-pulse"></div>
-          </div>
-        </div>
-        
-        <div className="lg:w-1/2">
-          <div className="bg-teal-500/10 border border-teal-500/30 rounded-xl p-6 relative">
-            <div className="absolute -top-3 -right-3 bg-teal-500 text-black px-2 py-1 rounded-full text-xs font-bold animate-pulse">
-              ACTIVE
-            </div>
-            <h3 className="text-xl font-bold text-teal-400 mb-3">
-              📈 Phase 2: Viral Growth
-            </h3>
-            <div className="text-sm text-gray-300 space-y-2">
-              <div>✅ Referral system with 10% rewards</div>
-              <div>✅ Comprehensive help system</div>
-              <div>🔄 Automated bonus payments</div>
-              <div>🎯 User leaderboards & social features</div>
-              <div>🎯 Target: 100+ active users, viral coefficient > 1.0</div>
-            </div>
-          </div>
-        </div>
-      </div>
+                  {/* Phase 2: AI Training Pipeline - IN PROGRESS */}
+                  <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-4 lg:space-y-0 lg:space-x-8">
+                    <div className="lg:w-1/2 lg:text-right">
+                      <div className="text-center lg:text-right">
+                        <div className="text-sm text-teal-400 font-semibold mb-1">ACTIVE DEVELOPMENT</div>
+                        <div className="text-gray-300">Building custom AI training pipeline with collected conversations</div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center text-black font-bold text-xl relative">
+                        2
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-teal-400 rounded-full animate-pulse"></div>
+                      </div>
+                    </div>
+                    
+                    <div className="lg:w-1/2">
+                      <div className="bg-teal-500/10 border border-teal-500/30 rounded-xl p-6 relative">
+                        <div className="absolute -top-3 -right-3 bg-teal-500 text-black px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+                          IN PROGRESS
+                        </div>
+                        <h3 className="text-xl font-bold text-teal-400 mb-3">
+                          🧠 Phase 2: Custom AI Training
+                        </h3>
+                        <div className="text-sm text-gray-300 space-y-2">
+                          <div>✅ Conversation data collection via IPFS</div>
+                          <div>🔄 Deploy trainable Llama 3.1 8B instance</div>
+                          <div>🔄 Monthly fine-tuning on user conversations</div>
+                          <div>🎯 Web search integration</div>
+                          <div>🎯 Code artifact generation</div>
+                          <div>🎯 Community-owned AI that gets smarter over time</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-      {/* Phase 3: Token Liquidity - NEXT */}
-      <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-4 lg:space-y-0 lg:space-x-8">
-        <div className="lg:w-1/2 lg:text-right">
-          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6 relative">
-            <div className="absolute -top-3 -right-3 bg-yellow-500 text-black px-2 py-1 rounded-full text-xs font-bold">
-              NEXT
-            </div>
-            <h3 className="text-xl font-bold text-yellow-400 mb-3">
-              💰 Phase 3: Token Market
-            </h3>
-            <div className="text-sm text-gray-300 space-y-2">
-              <div>🎯 POOL/USDC liquidity pool on QuickSwap</div>
-              <div>🎯 $10K-25K initial liquidity</div>
-              <div>🎯 Token trading & price discovery</div>
-              <div>🎯 Staking rewards for long-term holders</div>
-              <div>🎯 Enterprise partnerships & token utility</div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="flex-shrink-0">
-          <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-black font-bold text-xl">
-            3
-          </div>
-        </div>
-        
-        <div className="lg:w-1/2">
-          <div className="text-center lg:text-left">
-            <div className="text-sm text-yellow-400 font-semibold mb-1">4-6 WEEKS</div>
-            <div className="text-gray-300">Creating sustainable token economy</div>
-          </div>
-        </div>
-      </div>
+                  {/* Phase 3: Token Economy - NEXT */}
+                  <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-4 lg:space-y-0 lg:space-x-8">
+                    <div className="lg:w-1/2 lg:text-right">
+                      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6 relative">
+                        <div className="absolute -top-3 -right-3 bg-yellow-500 text-black px-2 py-1 rounded-full text-xs font-bold">
+                          NEXT
+                        </div>
+                        <h3 className="text-xl font-bold text-yellow-400 mb-3">
+                          💰 Phase 3: Token Economy
+                        </h3>
+                        <div className="text-sm text-gray-300 space-y-2">
+                          <div>🎯 POOL/USDC liquidity pool on QuickSwap</div>
+                          <div>🎯 Real-time token price discovery</div>
+                          <div>🎯 "1/3 Rule" subscription model</div>
+                          <div>🎯 Users pay 1/3 of previous month's earnings</div>
+                          <div>🎯 Always keep 2/3+ profit guaranteed</div>
+                          <div>🎯 Enterprise API access revenue</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-black font-bold text-xl">
+                        3
+                      </div>
+                    </div>
+                    
+                    <div className="lg:w-1/2">
+                      <div className="text-center lg:text-left">
+                        <div className="text-sm text-yellow-400 font-semibold mb-1">ECONOMIC REVOLUTION</div>
+                        <div className="text-gray-300">Sustainable model where AI serves users, not corporations</div>
+                      </div>
+                    </div>
+                  </div>
 
-      {/* Phase 4: AI Revolution - FUTURE */}
-      <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-4 lg:space-y-0 lg:space-x-8">
-        <div className="lg:w-1/2 lg:text-right">
-          <div className="text-center lg:text-right">
-            <div className="text-sm text-purple-400 font-semibold mb-1">REVOLUTIONARY</div>
-            <div className="text-gray-300">The first AI that pays users to use it</div>
-          </div>
-        </div>
-        
-        <div className="flex-shrink-0">
-          <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-black font-bold text-xl">
-            4
-          </div>
-        </div>
-        
-        <div className="lg:w-1/2">
-          <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-6 relative">
-            <div className="absolute -top-3 -right-3 bg-purple-500 text-black px-2 py-1 rounded-full text-xs font-bold">
-              VISION
-            </div>
-            <h3 className="text-xl font-bold text-purple-400 mb-3">
-              🤖 Phase 4: AI Revolution
-            </h3>
-            <div className="text-sm text-gray-300 space-y-2">
-              <div>🎯 Train custom LLM with collected prompts</div>
-              <div>🎯 AI that rewards users for conversations</div>
-              <div>🎯 Community-owned AI vs corporate monopolies</div>
-              <div>🎯 Global disruption of AI market</div>
-              <div>🎯 <strong className="text-purple-400">World's first profitable AI for users</strong></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+                  {/* Phase 4: AI Dominance - VISION */}
+                  <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-4 lg:space-y-0 lg:space-x-8">
+                    <div className="lg:w-1/2 lg:text-right">
+                      <div className="text-center lg:text-right">
+                        <div className="text-sm text-purple-400 font-semibold mb-1">THE VISION</div>
+                        <div className="text-gray-300">Disrupting the $150B+ AI industry with community ownership</div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-black font-bold text-xl">
+                        4
+                      </div>
+                    </div>
+                    
+                    <div className="lg:w-1/2">
+                      <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-6 relative">
+                        <div className="absolute -top-3 -right-3 bg-purple-500 text-black px-2 py-1 rounded-full text-xs font-bold">
+                          GLOBAL IMPACT
+                        </div>
+                        <h3 className="text-xl font-bold text-purple-400 mb-3">
+                          🌍 Phase 4: Market Disruption
+                        </h3>
+                        <div className="text-sm text-gray-300 space-y-2">
+                          <div>🎯 Custom AI rivals GPT-4 capabilities</div>
+                          <div>🎯 1M+ daily users earning crypto</div>
+                          <div>🎯 AI that gets smarter with every conversation</div>
+                          <div>🎯 Community governance and ownership</div>
+                          <div>🎯 Major exchange listings and partnerships</div>
+                          <div>🎯 <strong className="text-purple-400">Proof that AI can serve humanity, not extract from it</strong></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-  {/* Bottom Vision Statement */}
-  <div className="mt-12 text-center">
-    <div className="bg-gradient-to-r from-teal-500/10 to-purple-500/10 border border-teal-500/20 rounded-xl p-6">
-      <h4 className="text-lg font-bold text-white mb-2">
-        💡 The Big Picture
-      </h4>
-      <p className="text-gray-300 max-w-3xl mx-auto">
-        While others charge $20/month for AI, we're building the first AI that <strong className="text-teal-400">pays users</strong> to use it. 
-        Community ownership, transparent development, and sustainable token economics - 
-        this is the future of AI.
-      </p>
-    </div>
-  </div>
-</div>
+              {/* Bottom Vision Statement - UPDATED */}
+              <div className="mt-12 text-center">
+                <div className="bg-gradient-to-r from-teal-500/10 to-purple-500/10 border border-teal-500/20 rounded-xl p-6">
+                  <h4 className="text-lg font-bold text-white mb-2">
+                    🌊 The Revolution is LIVE
+                  </h4>
+                  <p className="text-gray-300 max-w-3xl mx-auto">
+                    While others charge $20/month for AI, PromptPool has successfully launched the first AI that <strong className="text-teal-400">pays users</strong> to chat with it. 
+                    Real users are earning real POOL tokens for real conversations. Community ownership, transparent development, and revolutionary economics - 
+                    the future of AI is here.
+                  </p>
+                  <div className="mt-4 flex justify-center">
+                    <button 
+                      onClick={() => setCurrentPage('pool-ai-chat')}
+                      className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-semibold py-2 px-6 rounded-full transition-all duration-200 transform hover:scale-105"
+                    >
+                      Experience the Revolution →
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* How It Works Page */}
+        {/* How It Works Page - COMPLETELY REVAMPED */}
         {currentPage === 'how-it-works' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div className="text-center mb-16">
               <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-teal-400 bg-clip-text text-transparent">
-                How PromptPool Works
+                How Pool AI Works
               </h1>
               <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Learn how our revolutionary &quot;Proof of Contribution&quot; system rewards quality over computational power
+                The world's first AI that pays users to chat. No subscriptions, no monthly fees - just earn POOL tokens for every conversation.
               </p>
             </div>
 
-            {/* Process Steps */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-              <div className="text-center">
-                <div className="bg-teal-500 text-black w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">1</div>
-                <h3 className="text-xl font-bold text-white mb-3">Connect Wallet</h3>
-                <p className="text-gray-400">Connect your crypto wallet using Web3Modal or MetaMask. Choose from multiple wallet options including WalletConnect and Coinbase Wallet.</p>
-              </div>
-              <div className="text-center">
-                <div className="bg-teal-500 text-black w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">2</div>
-                <h3 className="text-xl font-bold text-white mb-3">Create Prompts</h3>
-                <p className="text-gray-400">Write high-quality prompts for AI training. Your content is automatically uploaded to IPFS for permanent, decentralized storage.</p>
-              </div>
-              <div className="text-center">
-                <div className="bg-teal-500 text-black w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">3</div>
-                <h3 className="text-xl font-bold text-white mb-3">AI Evaluation</h3>
-                <p className="text-gray-400">Our advanced algorithms assess quality, originality, and training value to determine your reward tier and POOL token amount.</p>
-              </div>
-              <div className="text-center">
-                <div className="bg-teal-500 text-black w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">4</div>
-                <h3 className="text-xl font-bold text-white mb-3">Earn Rewards</h3>
-                <p className="text-gray-400">Receive POOL tokens instantly for Bronze/Silver tiers, or after expert review for Gold/Platinum tiers. All transactions are transparent on-chain.</p>
-              </div>
-            </div>
-
-            {/* Technical Overview */}
-            <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 mb-16">
-              <h2 className="text-3xl font-bold text-center text-white mb-8">Technical Architecture</h2>
+            {/* Revolutionary Comparison */}
+            <div className="bg-gradient-to-r from-red-500/10 to-green-500/10 border border-teal-500/20 rounded-xl p-8 mb-16">
+              <h2 className="text-2xl font-bold text-center text-white mb-8">🔄 The AI Revolution</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-6">
-                  <h3 className="text-xl font-bold text-teal-400">🌐 IPFS Integration</h3>
-                  <p className="text-gray-300">All prompts are stored on the InterPlanetary File System (IPFS), ensuring permanent, censorship-resistant access. Content is distributed across multiple nodes globally.</p>
-                  
-                  <h3 className="text-xl font-bold text-teal-400">⛓️ Smart Contracts</h3>
-                  <p className="text-gray-300">Built on Polygon for fast, low-cost transactions. Smart contracts automatically handle quality scoring, tier determination, and instant reward distribution.</p>
+                <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-6">
+                  <h3 className="text-xl font-bold text-red-400 mb-4 flex items-center">
+                    <span className="mr-2">💸</span>
+                    Traditional AI (ChatGPT, Claude)
+                  </h3>
+                  <ul className="space-y-3 text-gray-300">
+                    <li className="flex items-center"><span className="text-red-400 mr-2">❌</span>Pay $20+ per month</li>
+                    <li className="flex items-center"><span className="text-red-400 mr-2">❌</span>Corporate ownership</li>
+                    <li className="flex items-center"><span className="text-red-400 mr-2">❌</span>Data extraction model</li>
+                    <li className="flex items-center"><span className="text-red-400 mr-2">❌</span>Users get nothing back</li>
+                    <li className="flex items-center"><span className="text-red-400 mr-2">❌</span>Closed development</li>
+                  </ul>
+                  <div className="mt-4 p-3 bg-red-500/20 rounded-lg">
+                    <p className="text-red-300 text-sm font-semibold">Result: Users lose $240+ per year</p>
+                  </div>
                 </div>
-                <div className="space-y-6">
-                  <h3 className="text-xl font-bold text-teal-400">🧠 Quality Scoring</h3>
-                  <p className="text-gray-300">Multi-factor algorithm considers prompt length, complexity, originality, user reputation, and category-specific criteria to ensure fair evaluation.</p>
-                  
-                  <h3 className="text-xl font-bold text-teal-400">🔗 Multi-Wallet Support</h3>
-                  <p className="text-gray-300">Web3Modal integration provides seamless connection to 300+ wallets including MetaMask, WalletConnect, Coinbase Wallet, and hardware wallets.</p>
+                
+                <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-6">
+                  <h3 className="text-xl font-bold text-green-400 mb-4 flex items-center">
+                    <span className="mr-2">💰</span>
+                    PromptPool AI Revolution
+                  </h3>
+                  <ul className="space-y-3 text-gray-300">
+                    <li className="flex items-center"><span className="text-green-400 mr-2">✅</span>Get PAID to chat with AI</li>
+                    <li className="flex items-center"><span className="text-green-400 mr-2">✅</span>Community ownership</li>
+                    <li className="flex items-center"><span className="text-green-400 mr-2">✅</span>Fair value distribution</li>
+                    <li className="flex items-center"><span className="text-green-400 mr-2">✅</span>Users always profit</li>
+                    <li className="flex items-center"><span className="text-green-400 mr-2">✅</span>Transparent development</li>
+                  </ul>
+                  <div className="mt-4 p-3 bg-green-500/20 rounded-lg">
+                    <p className="text-green-300 text-sm font-semibold">Result: Users earn $100+ per year</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Reward Tiers */}
-            <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8">
-              <h2 className="text-3xl font-bold text-center text-white mb-8">Reward Structure</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-gradient-to-br from-orange-500/20 to-yellow-500/20 border border-orange-500/30 rounded-lg p-6">
-                  <h3 className="text-xl font-bold text-orange-400 mb-2">🥉 Bronze</h3>
-                  <div className="text-2xl font-bold text-white mb-2">5-10 POOL</div>
-                  <p className="text-sm text-gray-300">Instant approval for basic quality prompts. Perfect for getting started and building reputation.</p>
-                  <div className="mt-4 text-xs text-orange-300">
-                    • Automatic approval<br/>
-                    • Instant payment<br/>
-                    • No review required
+            {/* 4-Step Process - UPDATED */}
+            <div className="mb-16">
+              <h2 className="text-3xl font-bold text-center text-white mb-12">🚀 How to Start Earning</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="text-center group">
+                  <div className="bg-teal-500 text-black w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4 group-hover:scale-110 transition-transform">1</div>
+                  <h3 className="text-xl font-bold text-white mb-3">Connect Wallet</h3>
+                  <p className="text-gray-400">Connect your crypto wallet using Web3Modal. Supports MetaMask, WalletConnect, Coinbase Wallet, and 300+ others.</p>
+                  <div className="mt-4 text-xs text-teal-400">⚡ Takes 30 seconds</div>
+                </div>
+                
+                <div className="text-center group">
+                  <div className="bg-teal-500 text-black w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4 group-hover:scale-110 transition-transform">2</div>
+                  <h3 className="text-xl font-bold text-white mb-3">Chat with Pool AI</h3>
+                  <p className="text-gray-400">Start conversations with our Llama 3.1 8B AI. Ask questions, get help, have discussions - every message earns POOL tokens.</p>
+                  <div className="mt-4 text-xs text-teal-400">🤖 0.15+ POOL per message</div>
+                </div>
+                
+                <div className="text-center group">
+                  <div className="bg-teal-500 text-black w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4 group-hover:scale-110 transition-transform">3</div>
+                  <h3 className="text-xl font-bold text-white mb-3">Watch Earnings Grow</h3>
+                  <p className="text-gray-400">Real-time tracking shows your POOL earnings. Smart gas optimization tells you the perfect time to claim for maximum profit.</p>
+                  <div className="mt-4 text-xs text-teal-400">📈 Live optimization</div>
+                </div>
+                
+                <div className="text-center group">
+                  <div className="bg-teal-500 text-black w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-xl mx-auto mb-4 group-hover:scale-110 transition-transform">4</div>
+                  <h3 className="text-xl font-bold text-white mb-3">Claim When Optimal</h3>
+                  <p className="text-gray-400">Smart contract automatically distributes POOL tokens to your wallet. Gas optimization ensures you always profit.</p>
+                  <div className="mt-4 text-xs text-teal-400">💰 Always profitable</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Live Demo Section */}
+            <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 mb-16">
+              <h2 className="text-2xl font-bold text-center text-white mb-8">💡 See It In Action</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="space-y-6">
+                  <h3 className="text-xl font-bold text-teal-400">🎯 Example Conversation</h3>
+                  <div className="bg-slate-700/50 rounded-lg p-4 space-y-3">
+                    <div className="bg-teal-500 text-white rounded-lg p-3 ml-auto max-w-xs">
+                      <p className="text-sm">How do I optimize my React app performance?</p>
+                      <div className="text-xs opacity-75 mt-1">+0.18 POOL</div>
+                    </div>
+                    <div className="bg-slate-600 text-gray-200 rounded-lg p-3 mr-auto max-w-sm">
+                      <div className="flex items-center mb-2">
+                        <span className="text-teal-400 text-sm font-semibold">Pool AI</span>
+                      </div>
+                      <p className="text-sm">Here are the key React optimization strategies: 1) Use React.memo for components...</p>
+                    </div>
+                    <div className="bg-teal-500 text-white rounded-lg p-3 ml-auto max-w-xs">
+                      <p className="text-sm">Can you explain useMemo vs useCallback?</p>
+                      <div className="text-xs opacity-75 mt-1">+0.22 POOL</div>
+                    </div>
+                  </div>
+                  <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                    <p className="text-green-400 font-semibold text-sm">Session Total: 0.65 POOL (~$0.16)</p>
+                    <p className="text-gray-300 text-xs mt-1">Gas cost: ~$0.11 | Net profit: +$0.05</p>
                   </div>
                 </div>
-                <div className="bg-gradient-to-br from-gray-400/20 to-gray-300/20 border border-gray-400/30 rounded-lg p-6">
-                  <h3 className="text-xl font-bold text-gray-300 mb-2">🥈 Silver</h3>
-                  <div className="text-2xl font-bold text-white mb-2">15-25 POOL</div>
-                  <p className="text-sm text-gray-300">Instant approval for good quality prompts. Higher rewards for better content.</p>
-                  <div className="mt-4 text-xs text-gray-300">
-                    • Automatic approval<br/>
-                    • Instant payment<br/>
-                    • Quality threshold required
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-yellow-500/20 to-yellow-400/20 border border-yellow-500/30 rounded-lg p-6">
-                  <h3 className="text-xl font-bold text-yellow-400 mb-2">🥇 Gold</h3>
-                  <div className="text-2xl font-bold text-white mb-2">30-50 POOL</div>
-                  <p className="text-sm text-gray-300">Moderator review for high-quality prompts with significant training value.</p>
-                  <div className="mt-4 text-xs text-yellow-300">
-                    • Manual review<br/>
-                    • 24-48h approval<br/>
-                    • Expert evaluation
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-purple-500/20 to-purple-400/20 border border-purple-500/30 rounded-lg p-6">
-                  <h3 className="text-xl font-bold text-purple-400 mb-2">💎 Platinum</h3>
-                  <div className="text-2xl font-bold text-white mb-2">75-100 POOL</div>
-                  <p className="text-sm text-gray-300">Expert review for exceptional prompts that advance AI capabilities.</p>
-                  <div className="mt-4 text-xs text-purple-300">
-                    • Expert panel review<br/>
-                    • 2-7 day approval<br/>
-                    • Highest quality only
+                
+                <div className="space-y-6">
+                  <h3 className="text-xl font-bold text-teal-400">⚡ Smart Gas Optimization</h3>
+                  <div className="space-y-4">
+                    <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-red-400 font-semibold">Low Efficiency</span>
+                        <span className="text-red-400">1.2x</span>
+                      </div>
+                      <p className="text-gray-300 text-sm">Need 3 more messages for decent efficiency</p>
+                      <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
+                        <div className="bg-red-400 h-2 rounded-full w-1/4"></div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-yellow-400 font-semibold">Good Efficiency</span>
+                        <span className="text-yellow-400">3.5x</span>
+                      </div>
+                      <p className="text-gray-300 text-sm">You can claim now, or chat 2 more for optimal</p>
+                      <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
+                        <div className="bg-yellow-400 h-2 rounded-full w-3/5"></div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-green-400 font-semibold">Optimal Efficiency</span>
+                        <span className="text-green-400">5.8x</span>
+                      </div>
+                      <p className="text-gray-300 text-sm">Perfect time to claim! Maximum profitability</p>
+                      <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
+                        <div className="bg-green-400 h-2 rounded-full w-full"></div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Technical Architecture */}
+            <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 mb-16">
+              <h2 className="text-3xl font-bold text-center text-white mb-8">🔧 Revolutionary Technology</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="text-center">
+                  <div className="text-4xl mb-4">🤖</div>
+                  <h3 className="text-xl font-bold text-teal-400 mb-3">Real AI Integration</h3>
+                  <p className="text-gray-300 mb-4">Powered by Llama 3.1 8B via Groq for sub-second responses. Real contextual conversations, not chatbots.</p>
+                  <div className="bg-teal-500/10 rounded-lg p-3">
+                    <p className="text-teal-400 text-sm font-semibold">0.5s average response</p>
+                  </div>
+                </div>
+                
+                <div className="text-center">
+                  <div className="text-4xl mb-4">⚡</div>
+                  <h3 className="text-xl font-bold text-teal-400 mb-3">Smart Gas Optimization</h3>
+                  <p className="text-gray-300 mb-4">Real-time efficiency calculations guide optimal claiming windows. Revolutionary gas coverage system.</p>
+                  <div className="bg-teal-500/10 rounded-lg p-3">
+                    <p className="text-teal-400 text-sm font-semibold">1x to 10x+ efficiency</p>
+                  </div>
+                </div>
+                
+                <div className="text-center">
+                  <div className="text-4xl mb-4">🧠</div>
+                  <h3 className="text-xl font-bold text-teal-400 mb-3">AI Training Pipeline</h3>
+                  <p className="text-gray-300 mb-4">Conversations stored on IPFS for training custom models. Community-owned AI that gets smarter over time.</p>
+                  <div className="bg-teal-500/10 rounded-lg p-3">
+                    <p className="text-teal-400 text-sm font-semibold">Monthly improvements</p>
+                  </div>
+                </div>
+                
+                <div className="text-center">
+                  <div className="text-4xl mb-4">⛓️</div>
+                  <h3 className="text-xl font-bold text-teal-400 mb-3">Polygon Blockchain</h3>
+                  <p className="text-gray-300 mb-4">Enhanced smart contracts on Polygon for fast, low-cost transactions. Transparent, auditable rewards.</p>
+                  <div className="bg-teal-500/10 rounded-lg p-3">
+                    <p className="text-teal-400 text-sm font-semibold">~$0.11 gas cost</p>
+                  </div>
+                </div>
+                
+                <div className="text-center">
+                  <div className="text-4xl mb-4">🌐</div>
+                  <h3 className="text-xl font-bold text-teal-400 mb-3">IPFS Storage</h3>
+                  <p className="text-gray-300 mb-4">Conversations permanently stored on IPFS via Pinata. Decentralized, censorship-resistant data.</p>
+                  <div className="bg-teal-500/10 rounded-lg p-3">
+                    <p className="text-teal-400 text-sm font-semibold">Permanent storage</p>
+                  </div>
+                </div>
+                
+                <div className="text-center">
+                  <div className="text-4xl mb-4">💰</div>
+                  <h3 className="text-xl font-bold text-teal-400 mb-3">Revolutionary Economics</h3>
+                  <p className="text-gray-300 mb-4">1/3 subscription model ensures users always profit. First AI designed to serve users, not extract value.</p>
+                  <div className="bg-teal-500/10 rounded-lg p-3">
+                    <p className="text-teal-400 text-sm font-semibold">Always profitable</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Economics Deep Dive */}
+            <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-8 mb-16">
+              <h2 className="text-2xl font-bold text-center text-white mb-8">💎 The Economics Revolution</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <h3 className="text-xl font-bold text-green-400 mb-4">🎯 How Users Always Win</h3>
+                  <div className="space-y-4">
+                    <div className="bg-slate-700/30 rounded-lg p-4">
+                      <h4 className="font-semibold text-white mb-2">Monthly Earnings:</h4>
+                      <p className="text-gray-300 text-sm">Chat with Pool AI → Earn 150-300 POOL tokens</p>
+                      <p className="text-green-400 text-sm font-semibold">Value: $30-75+ per month</p>
+                    </div>
+                    
+                    <div className="bg-slate-700/30 rounded-lg p-4">
+                      <h4 className="font-semibold text-white mb-2">Subscription Cost:</h4>
+                      <p className="text-gray-300 text-sm">Pay 1/3 of what you earned last month</p>
+                      <p className="text-green-400 text-sm font-semibold">Cost: $10-25 per month</p>
+                    </div>
+                    
+                    <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4">
+                      <h4 className="font-semibold text-green-400 mb-2">Net Result:</h4>
+                      <p className="text-white font-semibold">Users keep 2/3+ of earnings</p>
+                      <p className="text-green-400 text-sm">Profit: $20-50+ per month</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-xl font-bold text-green-400 mb-4">📊 Comparison Chart</h3>
+                  <div className="space-y-4">
+                    <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+                      <h4 className="font-semibold text-red-400 mb-2">ChatGPT Plus User:</h4>
+                      <p className="text-gray-300 text-sm">Pays $20/month → Uses AI → Ends up -$240/year</p>
+                    </div>
+                    
+                    <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                      <h4 className="font-semibold text-green-400 mb-2">PromptPool User:</h4>
+                      <p className="text-gray-300 text-sm">Chats with AI → Earns POOL → Ends up +$240-600/year</p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-teal-500/20 to-green-500/20 border border-teal-500/30 rounded-lg p-4">
+                      <h4 className="font-semibold text-white mb-2">Total Difference:</h4>
+                      <p className="text-teal-400 text-lg font-bold">$500-850/year swing in your favor!</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Community Ownership */}
+            <div className="bg-slate-800/50 backdrop-blur-sm border border-purple-500/20 rounded-xl p-8 mb-16">
+              <h2 className="text-2xl font-bold text-center text-white mb-8">🌍 Community-Owned AI Future</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center">
+                  <div className="text-3xl mb-4">🤝</div>
+                  <h3 className="text-lg font-bold text-purple-400 mb-2">Community Ownership</h3>
+                  <p className="text-gray-300 text-sm">POOL token holders own and govern the AI. No corporate overlords extracting value.</p>
+                </div>
+                
+                <div className="text-center">
+                  <div className="text-3xl mb-4">🔬</div>
+                  <h3 className="text-lg font-bold text-purple-400 mb-2">Transparent Development</h3>
+                  <p className="text-gray-300 text-sm">All code open source. Community decides features, improvements, and AI training priorities.</p>
+                </div>
+                
+                <div className="text-center">
+                  <div className="text-3xl mb-4">📈</div>
+                  <h3 className="text-lg font-bold text-purple-400 mb-2">Gets Smarter Over Time</h3>
+                  <p className="text-gray-300 text-sm">Every conversation improves the AI. Monthly training cycles using community conversations.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Call to Action */}
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-white mb-6">Ready to Experience the Future?</h2>
+              <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                Join the revolution. Be part of the first community to prove that AI can serve humanity instead of extracting from it.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <button
+                  onClick={() => setCurrentPage('pool-ai-chat')}
+                  className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-bold py-4 px-8 rounded-full transition-all duration-200 transform hover:scale-105 shadow-xl"
+                >
+                  Start Earning with Pool AI 🤖
+                </button>
+                <button
+                  onClick={() => setCurrentPage('connect')}
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-full transition-all duration-200 transform hover:scale-105 shadow-xl"
+                >
+                  Learn More 📚
+                </button>
+              </div>
+              <p className="text-sm text-gray-400 mt-6">
+                No credit card required. Just connect your wallet and start earning.
+              </p>
             </div>
           </div>
         )}
 
-        {/* Enhanced Connect & Contribute Page */}
+        {/* Getting Started / New User Guide Page */}
         {currentPage === 'connect' && (
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div className="text-center mb-12">
               <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-teal-400 bg-clip-text text-transparent">
-                Connect & Contribute
+                Getting Started
               </h1>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Start earning POOL tokens by contributing valuable prompts with IPFS storage and instant blockchain rewards
+              <p className="text-xl text-gray-300 max-w-4xl mx-auto">
+                New to crypto? No problem! This guide will walk you through everything you need to know to start earning POOL tokens with our AI chat system.
               </p>
             </div>
 
-        {/* POL Gas Faucet Callout */}
-<div className="mb-12">
-  <div className="bg-gradient-to-r from-teal-500/10 via-cyan-400/10 to-blue-500/10 border border-teal-400/30 rounded-xl p-6 backdrop-blur-sm">
-    <div className="flex items-center justify-center space-x-3 mb-4">
-      <div className="text-3xl">⛽</div>
-      <h3 className="text-xl font-bold text-teal-400">Need Gas for Transactions?</h3>
-    </div>
-    <p className="text-center text-gray-300 mb-4">
-      New to Polygon? Get free POL tokens for gas fees and start your PromptPool journey immediately!
-    </p>
-    <div className="flex justify-center">
-      <a
-        href="https://faucet.polygon.technology/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-semibold py-3 px-6 rounded-full transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center space-x-2"
-      >
-        <span>🚰</span>
-        <span>Get Free POL Tokens</span>
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-        </svg>
-      </a>
-    </div>
-    <div className="mt-4 text-center">
-      <p className="text-sm text-gray-400">
-        💡 <strong>Tip:</strong> You only need a small amount (~$0.01) for multiple transactions on Polygon!
-      </p>
-    </div>
-  </div>
-</div>
-
-{/* Help & Tips Section */}
-<div className="mb-12">
-  <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8">
-    <h3 className="text-2xl font-bold text-white mb-6 text-center flex items-center justify-center">
-      <span className="mr-3">💡</span>
-      Quick Help & Tips
-    </h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <button 
-        onClick={() => setActiveModal('prompts')}
-        className="bg-green-500/10 border border-green-400/30 rounded-lg p-4 text-left hover:bg-green-500/20 transition-colors"
-      >
-        <div className="flex items-center mb-2">
-          <span className="text-2xl mr-3">📝</span>
-          <h4 className="text-green-400 font-semibold">What makes a good prompt?</h4>
-        </div>
-        <p className="text-sm text-gray-300">Learn how to write high-quality prompts that earn more POOL tokens</p>
-      </button>
-      
-      <button 
-        onClick={() => setActiveModal('rewards')}
-        className="bg-yellow-500/10 border border-yellow-400/30 rounded-lg p-4 text-left hover:bg-yellow-500/20 transition-colors"
-      >
-        <div className="flex items-center mb-2">
-          <span className="text-2xl mr-3">💰</span>
-          <h4 className="text-yellow-400 font-semibold">How do rewards work?</h4>
-        </div>
-        <p className="text-sm text-gray-300">Understand the tier system and how to maximize your earnings</p>
-      </button>
-      
-      <button 
-        onClick={() => setActiveModal('wallet')}
-        className="bg-blue-500/10 border border-blue-400/30 rounded-lg p-4 text-left hover:bg-blue-500/20 transition-colors"
-      >
-        <div className="flex items-center mb-2">
-          <span className="text-2xl mr-3">🔗</span>
-          <h4 className="text-blue-400 font-semibold">How to connect wallet?</h4>
-        </div>
-        <p className="text-sm text-gray-300">Step-by-step guide for connecting MetaMask and other wallets</p>
-      </button>
-      
-      <button 
-        onClick={() => setActiveModal('ipfs')}
-        className="bg-purple-500/10 border border-purple-400/30 rounded-lg p-4 text-left hover:bg-purple-500/20 transition-colors"
-      >
-        <div className="flex items-center mb-2">
-          <span className="text-2xl mr-3">🌐</span>
-          <h4 className="text-purple-400 font-semibold">What is IPFS storage?</h4>
-        </div>
-        <p className="text-sm text-gray-300">Learn about permanent, decentralized storage for your prompts</p>
-      </button>
-    </div>
-  </div>
-</div>
-
-{/* Referral Code Input - Shows when user is NOT connected */}
-{!displayIsConnected && (
-  <div className="mb-8">
-    <div className="bg-blue-500/10 border border-blue-400/30 rounded-xl p-6">
-      <h3 className="text-lg font-bold text-blue-400 mb-4 flex items-center">
-        <span className="mr-2">🎁</span>
-        Have a Referral Code?
-      </h3>
-      <p className="text-gray-300 mb-4 text-sm">
-        Enter a friend's referral code and they'll earn 10% of your POOL rewards!
-      </p>
-      <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-        <input
-          type="text"
-          placeholder="Enter referral code (optional)"
-          value={referralCode}
-          onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-          className="flex-1 px-4 py-3 bg-slate-700/50 border border-blue-500/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
-        />
-        <button 
-          onClick={validateReferralCode}
-          disabled={!referralCode.trim()}
-          className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg transition-colors whitespace-nowrap"
-        >
-          Validate
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-            {!displayIsConnected ? (
-              <div className="text-center py-16">
-                <div className="text-6xl mb-6">🔗</div>
-                <h3 className="text-3xl font-bold text-white mb-6">Connect Your Wallet</h3>
-                <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
-                  Connect your wallet to start earning POOL tokens. Choose from multiple wallet options with our enhanced Web3Modal integration.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                  <button
-                    onClick={connectWallet}
-                    className="hidden bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-bold py-4 px-8 rounded-full transition-all duration-200 transform hover:scale-105 shadow-xl"
-                  >
-                    Connect with MetaMask 🦊
-                  </button>
-                  <span className="hidden text-gray-500">or</span>
-                  <WagmiConnectButton />
+            {/* Step-by-Step Process for Beginners */}
+            <div className="mb-16">
+              <h2 className="text-3xl font-bold text-center text-white mb-12">🚀 Your Journey to Earning Crypto</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="text-center group">
+                  <div className="bg-blue-500 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4 group-hover:scale-110 transition-transform">1</div>
+                  <h3 className="text-xl font-bold text-white mb-3">Create Wallet</h3>
+                  <p className="text-gray-400">Download MetaMask or use Web3Modal to create your first crypto wallet. Think of it like a digital bank account.</p>
+                  <div className="mt-4 text-xs text-blue-400">⏱️ Takes 2 minutes</div>
+                </div>
+                
+                <div className="text-center group">
+                  <div className="bg-green-500 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4 group-hover:scale-110 transition-transform">2</div>
+                  <h3 className="text-xl font-bold text-white mb-3">Get Gas Tokens</h3>
+                  <p className="text-gray-400">Use our free faucet to get POL tokens for "gas fees" - the small cost to process transactions on the blockchain.</p>
+                  <div className="mt-4 text-xs text-green-400">💰 Completely free</div>
+                </div>
+                
+                <div className="text-center group">
+                  <div className="bg-teal-500 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4 group-hover:scale-110 transition-transform">3</div>
+                  <h3 className="text-xl font-bold text-white mb-3">Connect & Chat</h3>
+                  <p className="text-gray-400">Connect your wallet to PromptPool and start chatting with our AI. Each conversation earns you POOL tokens automatically.</p>
+                  <div className="mt-4 text-xs text-teal-400">🤖 Earn 0.15+ POOL per message</div>
+                </div>
+                
+                <div className="text-center group">
+                  <div className="bg-purple-500 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4 group-hover:scale-110 transition-transform">4</div>
+                  <h3 className="text-xl font-bold text-white mb-3">Claim Rewards</h3>
+                  <p className="text-gray-400">When our smart system shows optimal efficiency, claim your POOL tokens to your wallet. Always profitable!</p>
+                  <div className="mt-4 text-xs text-purple-400">📈 Guaranteed profit</div>
                 </div>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                
-                {/* Enhanced Submit Prompt */}
-                <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8">
-                  <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
-                    <span className="mr-3">✨</span>
-                    Submit New Prompt
-                  </h3>
-                  
-                  {/* IPFS Status */}
-                  <div className={`mb-6 p-3 rounded-lg border ${ipfsConfig.isDemo ? 'bg-yellow-500/10 border-yellow-500/30' : 'bg-green-500/10 border-green-500/30'}`}>
-                    <div className="flex items-center space-x-2">
-                      <div className="text-lg">{ipfsConfig.isDemo ? '🧪' : '🌐'}</div>
-                      <div className="text-sm">
-                        <div className="font-semibold">{ipfsConfig.isDemo ? 'Demo Mode' : 'Production IPFS'}</div>
-                        <div className="text-xs opacity-75">
-                          {ipfsConfig.isDemo ? 'Using simulated IPFS for testing' : 'Connected to Pinata IPFS'}
-                        </div>
-                      </div>
+            </div>
+
+            {/* Understanding Gas - NEW SECTION */}
+            <div className="bg-slate-800/50 backdrop-blur-sm border border-orange-500/20 rounded-xl p-8 mb-12">
+              <h2 className="text-2xl font-bold text-center text-white mb-8 flex items-center justify-center">
+                <span className="mr-3">⛽</span>
+                Understanding Gas Fees (Don't Worry, It's Simple!)
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-6">
+                  <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-6">
+                    <h3 className="text-lg font-bold text-orange-400 mb-3 flex items-center">
+                      <span className="mr-2">🤔</span>
+                      What is Gas?
+                    </h3>
+                    <p className="text-gray-300 mb-4">
+                      Think of gas like a small transaction fee at your bank, but much cheaper! Every time you send crypto or claim rewards, 
+                      you pay a tiny amount (usually $0.01-$0.50) to the network that processes your transaction.
+                    </p>
+                    <div className="bg-slate-700/50 rounded-lg p-3">
+                      <p className="text-sm text-gray-400">
+                        <strong className="text-orange-400">Real Example:</strong> Claiming 5 POOL tokens (worth ~$1.25) costs about $0.11 in gas. 
+                        You profit $1.14! 📈
+                      </p>
                     </div>
                   </div>
                   
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-medium text-teal-400 mb-2">
-                        Prompt Title
-                      </label>
-                      <input
-                        type="text"
-                        value={promptTitle}
-                        onChange={(e) => setPromptTitle(e.target.value)}
-                        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:border-teal-500 focus:outline-none transition-colors"
-                        placeholder="Enter a descriptive title..."
-                        maxLength={100}
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-teal-400 mb-2">
-                        Category
-                      </label>
-                      <select
-                        value={category}
-                        onChange={(e) => setCategory(parseInt(e.target.value))}
-                        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:border-teal-500 focus:outline-none transition-colors"
-                      >
-                        <option value={0}>Creative Writing</option>
-                        <option value={1}>Technical/Programming</option>
-                        <option value={2}>Educational</option>
-                        <option value={3}>Conversational</option>
-                        <option value={4}>Analytical/Research</option>
-                        <option value={5}>Other</option>
-                      </select>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-teal-400 mb-2">
-                        Prompt Content
-                      </label>
-                      <textarea
-                        value={promptContent}
-                        onChange={(e) => setPromptContent(e.target.value)}
-                        className="w-full h-40 bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:border-teal-500 focus:outline-none resize-none transition-colors"
-                        placeholder="Write your detailed prompt here... (minimum 20 characters)"
-                        maxLength={2000}
-                      />
-                      <div className="flex justify-between text-xs text-gray-500 mt-1">
-                        <span>{promptContent.length}/2000</span>
-                        <span className={promptContent.length >= 20 ? 'text-green-400' : 'text-red-400'}>
-                          {promptContent.length >= 20 ? '✓ Valid length' : `Need ${20 - promptContent.length} more characters`}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    {promptContent.length >= 20 && (
-                      <div className="bg-teal-500/10 border border-teal-500/30 rounded-lg p-4">
-                        <div className="text-sm text-teal-400">
-                          Estimated Reward: <span className="font-bold text-lg">{parseFloat(displayEstimatedReward).toFixed(2)} POOL</span>
-                        </div>
-                        <div className="text-xs text-gray-400 mt-1">
-                          Will be stored on IPFS permanently
-                        </div>
-                      </div>
-                    )}
-                    
-                    <button
-                      onClick={handleSubmitPrompt}
-                      disabled={!promptTitle || promptContent.length < 20 || isSubmitting}
-                      className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 disabled:from-gray-600 disabled:to-gray-600 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
-                    >
-                      {isSubmitting ? '⏳ Processing...' : '🚀 Submit to IPFS & Blockchain'}
-                    </button>
+                  <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6">
+                    <h3 className="text-lg font-bold text-blue-400 mb-3 flex items-center">
+                      <span className="mr-2">⚡</span>
+                      Why Polygon is Amazing
+                    </h3>
+                    <ul className="text-gray-300 space-y-2 text-sm">
+                      <li className="flex items-center"><span className="text-green-400 mr-2">✅</span>Super low fees (under $0.50 usually)</li>
+                      <li className="flex items-center"><span className="text-green-400 mr-2">✅</span>Lightning fast transactions (2-3 seconds)</li>
+                      <li className="flex items-center"><span className="text-green-400 mr-2">✅</span>Environmentally friendly</li>
+                      <li className="flex items-center"><span className="text-green-400 mr-2">✅</span>Same security as Ethereum</li>
+                    </ul>
                   </div>
                 </div>
-
-                {/* Enhanced User Dashboard with Collapsible Contributions */}
-                <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8">
-                  <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
-                    <span className="mr-3">📊</span>
-                    Your Dashboard
-                  </h3>
+                
+                <div className="space-y-6">
+                  <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-6">
+                    <h3 className="text-lg font-bold text-green-400 mb-3 flex items-center">
+                      <span className="mr-2">💡</span>
+                      Pro Tips for Gas Management
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="bg-slate-700/50 rounded-lg p-3">
+                        <h4 className="text-white font-semibold text-sm mb-1">1. Start with Free Faucet</h4>
+                        <p className="text-gray-400 text-xs">Get free POL tokens below - enough for 10+ transactions!</p>
+                      </div>
+                      
+                      <div className="bg-slate-700/50 rounded-lg p-3">
+                        <h4 className="text-white font-semibold text-sm mb-1">2. Consider Adding $5 POL</h4>
+                        <p className="text-gray-400 text-xs">For peace of mind, $5 worth of POL tokens = 50+ transactions</p>
+                      </div>
+                      
+                      <div className="bg-slate-700/50 rounded-lg p-3">
+                        <h4 className="text-white font-semibold text-sm mb-1">3. Future: Trade POOL for POL</h4>
+                        <p className="text-gray-400 text-xs">Soon you'll be able to exchange earned POOL tokens for more POL gas!</p>
+                      </div>
+                    </div>
+                  </div>
                   
-                  {displayUserStats ? (
-                    <div className="space-y-6">
-                      {/* Existing Stats Grid */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-slate-700/50 rounded-lg p-4 text-center">
-                          <div className="text-2xl font-bold text-teal-400">{displayUserStats.totalSubmissions}</div>
-                          <div className="text-sm text-gray-400">Submitted</div>
-                        </div>
-                        <div className="bg-slate-700/50 rounded-lg p-4 text-center">
-                          <div className="text-2xl font-bold text-green-400">{displayUserStats.approvedSubmissions}</div>
-                          <div className="text-sm text-gray-400">Approved</div>
-                        </div>
-                      </div>
-                      
-                      {/* Existing Total Earned */}
-                      <div className="bg-gradient-to-r from-teal-500/20 to-cyan-500/20 border border-teal-500/30 rounded-lg p-6">
-                        <div className="text-center">
-                          <div className="text-3xl font-bold text-white mb-2">
-                            {parseFloat(displayUserStats.totalRewards).toFixed(2)} POOL
-                          </div>
-                          <div className="text-sm text-gray-300">Total Earned</div>
-                        </div>
-                      </div>
-                      
-                      {/* Existing Stats Details */}
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-400">Current Tier:</span>
-                          <span className={`font-bold ${getTierColor(displayUserStats.currentTier)}`}>
-                            {getTierName(displayUserStats.currentTier)}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-400">Reputation:</span>
-                          <span className="text-white font-semibold">{displayUserStats.reputationScore}/1000</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-400">Connection:</span>
-                          <span className="text-teal-400 font-semibold">
-                            {isWagmiConnected ? 'Web3Modal' : 'Legacy'}
-                          </span>
-                        </div>
-                      </div>
+                  <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-6">
+                    <h3 className="text-lg font-bold text-purple-400 mb-3">🎯 The Bottom Line</h3>
+                    <p className="text-gray-300 text-sm">
+                      Our smart gas optimization system ensures you <strong className="text-purple-400">always profit</strong> from your transactions. 
+                      The system won't let you claim rewards unless you'll make money! 
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                      {/* NEW: Collapsible Contributions Section */}
-                      <div className="border-t border-slate-600/30 pt-6">
-                        <button
-                          onClick={() => setShowContributions(!showContributions)}
-                          className="w-full flex items-center justify-between text-left hover:bg-slate-700/30 rounded-lg p-3 transition-colors"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <span className="text-lg">📝</span>
-                            <div>
-                              <h4 className="text-lg font-semibold text-white">My Contributions</h4>
-                              <p className="text-sm text-gray-400">
-                                {userContributions.length} prompts saved permanently
-                              </p>
-                            </div>
-                          </div>
-                          <div className={`transform transition-transform ${showContributions ? 'rotate-180' : ''}`}>
-                            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </div>
-                        </button>
+            {/* POL Gas Faucet Callout - ENHANCED */}
+            <div className="mb-12">
+              <div className="bg-gradient-to-r from-teal-500/10 via-cyan-400/10 to-blue-500/10 border border-teal-400/30 rounded-xl p-8 backdrop-blur-sm">
+                <div className="text-center mb-6">
+                  <div className="text-4xl mb-4">🚰</div>
+                  <h3 className="text-2xl font-bold text-teal-400 mb-2">Free POL Gas Faucet</h3>
+                  <p className="text-gray-300 max-w-2xl mx-auto">
+                    Get free POL tokens for gas fees! Perfect for newcomers to try PromptPool risk-free. 
+                    This will give you enough gas for 10+ transactions.
+                  </p>
+                </div>
+                
+                <div className="flex justify-center mb-6">
+                  <a
+                    href="https://faucet.polygon.technology/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-semibold py-4 px-8 rounded-full transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center space-x-3"
+                  >
+                    <span>🚰</span>
+                    <span>Get Free POL Tokens</span>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                  <div className="bg-slate-700/30 rounded-lg p-4">
+                    <div className="text-lg font-bold text-white mb-1">💰 Free Forever</div>
+                    <p className="text-sm text-gray-400">No catch - completely free POL tokens from Polygon's official faucet</p>
+                  </div>
+                  <div className="bg-slate-700/30 rounded-lg p-4">
+                    <div className="text-lg font-bold text-white mb-1">⚡ Instant</div>
+                    <p className="text-sm text-gray-400">Tokens arrive in your wallet within 30 seconds</p>
+                  </div>
+                  <div className="bg-slate-700/30 rounded-lg p-4">
+                    <div className="text-lg font-bold text-white mb-1">🔄 Renewable</div>
+                    <p className="text-sm text-gray-400">Can request more tokens every 24 hours if needed</p>
+                  </div>
+                </div>
+                
+                <div className="mt-6 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                  <p className="text-center text-blue-300 text-sm">
+                    <strong>💡 Pro Tip:</strong> After getting free tokens, consider adding $5 worth of POL to your wallet for long-term use. 
+                    You can buy POL on any major crypto exchange like Coinbase, Binance, or directly through MetaMask!
+                  </p>
+                </div>
+              </div>
+            </div>
 
-                        {/* Collapsible Content */}
-                        <div className={`mt-4 space-y-3 transition-all duration-300 ${showContributions ? 'opacity-100 max-h-96 overflow-y-auto' : 'opacity-0 max-h-0 overflow-hidden'}`}>
-                          {userContributions.length > 0 ? (
-                            userContributions.map((contribution) => (
-                              <div key={contribution.id} className="bg-slate-700/30 rounded-lg p-4 border border-slate-600/30">
-                                <div className="flex items-start justify-between mb-2">
-                                  <h5 className="font-semibold text-white text-sm truncate flex-1 mr-2">
-                                    {contribution.title}
-                                  </h5>
-                                  <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                    contribution.status === 'approved' 
-                                      ? 'bg-green-500/20 text-green-400' 
-                                      : 'bg-yellow-500/20 text-yellow-400'
-                                  }`}>
-                                    {contribution.status}
-                                  </span>
-                                </div>
-                                
-                                <div className="space-y-2 text-xs">
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-gray-400">Category:</span>
-                                    <span className="text-gray-300">
-                                      {getCategoryName(contribution.category)}
-                                    </span>
-                                  </div>
-                                  
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-gray-400">Reward:</span>
-                                    <span className="text-teal-400 font-medium">{parseFloat(contribution.reward).toFixed(2)} POOL</span>
-                                  </div>
-                                  
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-gray-400">Submitted:</span>
-                                    <span className="text-gray-300">
-                                      {new Date(contribution.submittedAt).toLocaleDateString()}
-                                    </span>
-                                  </div>
-                                  
-                                  <div className="pt-2 border-t border-slate-600/30">
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-gray-400">IPFS:</span>
-                                      <div className="flex space-x-2">
-                                        <a
-                                          href={`https://gateway.pinata.cloud/ipfs/${contribution.ipfsHash}`}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="text-teal-400 hover:text-white transition-colors"
-                                          title="View on Pinata Gateway"
-                                        >
-                                          📎 Pinata
-                                        </a>
-                                        <a
-                                          href={`https://ipfs.io/ipfs/${contribution.ipfsHash}`}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="text-teal-400 hover:text-white transition-colors"
-                                          title="View on IPFS.io Gateway"
-                                        >
-                                          🌐 IPFS
-                                        </a>
-                                      </div>
-                                    </div>
-                                    <div className="mt-1">
-                                      <p className="text-gray-500 font-mono text-xs break-all">
-                                        {contribution.ipfsHash}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="text-center py-8 text-gray-400">
-                              <div className="text-4xl mb-2">📝</div>
-                              <p className="text-sm">No contributions yet</p>
-                              <p className="text-xs text-gray-500 mt-1">Submit your first prompt to see it here!</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+            {/* Updated Quick Help & Tips - RELEVANT TO AI CHAT */}
+            <div className="mb-12">
+              <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8">
+                <h3 className="text-2xl font-bold text-white mb-8 text-center flex items-center justify-center">
+                  <span className="mr-3">💡</span>
+                  Quick Help & Essential Info
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <button 
+                    onClick={() => setActiveModal('wallet')}
+                    className="bg-blue-500/10 border border-blue-400/30 rounded-lg p-6 text-left hover:bg-blue-500/20 transition-colors"
+                  >
+                    <div className="flex items-center mb-3">
+                      <span className="text-3xl mr-4">🔗</span>
+                      <h4 className="text-blue-400 font-semibold text-lg">How to connect your wallet?</h4>
                     </div>
-                  ) : (
-                    <div className="text-center py-8 text-gray-400">
-                      Submit your first prompt to see stats!
+                    <p className="text-sm text-gray-300">Complete step-by-step guide for connecting MetaMask, Coinbase Wallet, and 300+ other wallets</p>
+                  </button>
+                  
+                  <button 
+                    onClick={() => setActiveModal('ai-chat')}
+                    className="bg-green-500/10 border border-green-400/30 rounded-lg p-6 text-left hover:bg-green-500/20 transition-colors"
+                  >
+                    <div className="flex items-center mb-3">
+                      <span className="text-3xl mr-4">🤖</span>
+                      <h4 className="text-green-400 font-semibold text-lg">How to maximize AI chat earnings?</h4>
                     </div>
-                  )}
+                    <p className="text-sm text-gray-300">Learn how to have profitable conversations and understand gas optimization timing</p>
+                  </button>
+                  
+                  <button 
+                    onClick={() => setActiveModal('gas-optimization')}
+                    className="bg-yellow-500/10 border border-yellow-400/30 rounded-lg p-6 text-left hover:bg-yellow-500/20 transition-colors"
+                  >
+                    <div className="flex items-center mb-3">
+                      <span className="text-3xl mr-4">⚡</span>
+                      <h4 className="text-yellow-400 font-semibold text-lg">Understanding gas optimization?</h4>
+                    </div>
+                    <p className="text-sm text-gray-300">Learn how our smart system ensures you always profit from claiming rewards</p>
+                  </button>
+                  
+                  <button 
+                    onClick={() => setActiveModal('crypto-basics')}
+                    className="bg-purple-500/10 border border-purple-400/30 rounded-lg p-6 text-left hover:bg-purple-500/20 transition-colors"
+                  >
+                    <div className="flex items-center mb-3">
+                      <span className="text-3xl mr-4">🎓</span>
+                      <h4 className="text-purple-400 font-semibold text-lg">New to crypto? Start here!</h4>
+                    </div>
+                    <p className="text-sm text-gray-300">Crypto basics explained simply - wallets, tokens, blockchain, and why it's revolutionary</p>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Referral Code Input - Shows when user is NOT connected */}
+            {!displayIsConnected && (
+              <div className="mb-12">
+                <div className="bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-400/30 rounded-xl p-8">
+                  <div className="text-center mb-6">
+                    <div className="text-4xl mb-4">🎁</div>
+                    <h3 className="text-2xl font-bold text-pink-400 mb-2">Got a Referral Code?</h3>
+                    <p className="text-gray-300 max-w-2xl mx-auto">
+                      If a friend referred you to PromptPool, enter their code below! They'll earn 10% of all your POOL rewards 
+                      (doesn't reduce your earnings - it's a bonus from us).
+                    </p>
+                  </div>
+                  
+                  <div className="max-w-md mx-auto">
+                    <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+                      <input
+                        type="text"
+                        placeholder="Enter referral code (optional)"
+                        value={referralCode}
+                        onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                        className="flex-1 px-4 py-3 bg-slate-700/50 border border-pink-500/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-pink-400 text-center sm:text-left"
+                      />
+                      <button 
+                        onClick={validateReferralCode}
+                        disabled={!referralCode.trim()}
+                        className="bg-pink-500 hover:bg-pink-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg transition-colors whitespace-nowrap"
+                      >
+                        Validate
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-6 text-center">
+                    <p className="text-sm text-gray-400">
+                      Don't have a referral code? No problem! You can still earn POOL tokens and refer friends later.
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
-            {/* Referral Dashboard - Shows when user IS connected */}
-{displayIsConnected && (
-  <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8 mb-8">
-    <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
-      <span className="mr-3">👥</span>
-      Refer Friends & Earn
-    </h3>
-    
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-      {/* Your Referral Code */}
-      <div className="text-center">
-        <h4 className="text-lg font-semibold text-teal-400 mb-3">Your Referral Code</h4>
-        <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
-          <code className="text-white font-mono text-xl">{userReferralCode}</code>
-        </div>
-        <button 
-          onClick={copyReferralLink}
-          className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center mx-auto space-x-2"
-        >
-          <span>📋</span>
-          <span>Copy Link</span>
-        </button>
-      </div>
-      
-      {/* Referral Stats */}
-      <div className="text-center">
-        <h4 className="text-lg font-semibold text-teal-400 mb-3">Friends Referred</h4>
-        <div className="text-3xl font-bold text-white mb-2">{referralStats.totalReferrals}</div>
-        <div className="text-gray-400 text-sm">People joined through your link</div>
-      </div>
-      
-      <div className="text-center">
-        <h4 className="text-lg font-semibold text-teal-400 mb-3">Bonus Earned</h4>
-        <div className="text-3xl font-bold text-green-400 mb-2">
-          {parseFloat(referralStats.totalEarnings || '0').toFixed(1)} POOL
-        </div>
-        <div className="text-gray-400 text-sm">10% of friends' rewards</div>
-      </div>
-    </div>
-    
-    {/* How it works */}
-    <div className="bg-slate-700/30 rounded-lg p-4">
-      <h5 className="text-white font-semibold mb-2">💡 How Referrals Work:</h5>
-      <ul className="text-gray-300 text-sm space-y-1">
-        <li>• Share your referral link with friends</li>
-        <li>• When they submit prompts and earn POOL, you get 10% bonus</li>
-        <li>• No limit on referrals - the more friends, the more you earn!</li>
-        <li>• Bonuses are paid automatically with each prompt submission</li>
-      </ul>
-    </div>
-  </div>
-)}
+
+            {/* Wallet Connection Section */}
+            {!displayIsConnected ? (
+              <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-12">
+                <div className="text-center">
+                  <div className="text-6xl mb-6">🚀</div>
+                  <h3 className="text-3xl font-bold text-white mb-6">Ready to Start Earning?</h3>
+                  <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
+                    Connect your wallet to begin chatting with our AI and earning POOL tokens. Choose from multiple wallet options 
+                    with our enhanced Web3Modal integration - we support over 300 different wallets!
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <WagmiConnectButton />
+                    <button
+                      onClick={connectWallet}
+                      className="hidden bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-4 px-8 rounded-full transition-all duration-200 transform hover:scale-105 shadow-xl"
+                    >
+                      Connect with MetaMask 🦊
+                    </button>
+                  </div>
+                  <p className="text-sm text-gray-400 mt-6">
+                    Don't have a wallet? MetaMask is beginner-friendly and takes 2 minutes to set up!
+                  </p>
+                </div>
+              </div>
+            ) : (
+              /* Connected User Dashboard - Simple Version */
+              <div className="bg-slate-800/50 backdrop-blur-sm border border-teal-500/20 rounded-xl p-8">
+                <div className="text-center mb-8">
+                  <div className="text-4xl mb-4">🎉</div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Welcome to PromptPool!</h3>
+                  <p className="text-gray-300 mb-6">
+                    Your wallet is connected and you're ready to start earning POOL tokens. Head over to our AI chat to begin!
+                  </p>
+                  <button 
+                    onClick={() => setCurrentPage('pool-ai-chat')}
+                    className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-bold py-4 px-8 rounded-full transition-all duration-200 transform hover:scale-105 shadow-xl"
+                  >
+                    Start Chatting & Earning 🤖
+                  </button>
+                </div>
+
+                {/* Referral Dashboard for Connected Users */}
+                {userReferralCode && (
+                  <div className="border-t border-slate-600/30 pt-8">
+                    <h4 className="text-xl font-bold text-white mb-6 text-center flex items-center justify-center">
+                      <span className="mr-3">👥</span>
+                      Refer Friends & Earn Bonuses
+                    </h4>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                      <div className="text-center">
+                        <h5 className="text-lg font-semibold text-teal-400 mb-3">Your Referral Code</h5>
+                        <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
+                          <code className="text-white font-mono text-xl">{userReferralCode}</code>
+                        </div>
+                        <button 
+                          onClick={copyReferralLink}
+                          className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center mx-auto space-x-2"
+                        >
+                          <span>📋</span>
+                          <span>Copy Link</span>
+                        </button>
+                      </div>
+                      
+                      <div className="text-center">
+                        <h5 className="text-lg font-semibold text-teal-400 mb-3">Friends Referred</h5>
+                        <div className="text-3xl font-bold text-white mb-2">{referralStats.totalReferrals}</div>
+                        <div className="text-gray-400 text-sm">People joined through your link</div>
+                      </div>
+                      
+                      <div className="text-center">
+                        <h5 className="text-lg font-semibold text-teal-400 mb-3">Bonus Earned</h5>
+                        <div className="text-3xl font-bold text-green-400 mb-2">
+                          {parseFloat(referralStats.totalEarnings || '0').toFixed(1)} POOL
+                        </div>
+                        <div className="text-gray-400 text-sm">10% of friends' rewards</div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-slate-700/30 rounded-lg p-4">
+                      <h6 className="text-white font-semibold mb-2">💡 How Referrals Work:</h6>
+                      <ul className="text-gray-300 text-sm space-y-1">
+                        <li>• Share your referral link with friends</li>
+                        <li>• When they chat with AI and earn POOL, you get 10% bonus</li>
+                        <li>• No limit on referrals - the more friends, the more you earn!</li>
+                        <li>• Bonuses are paid automatically when they claim rewards</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -2180,6 +2340,12 @@ const validateReferralCode = async () => {
                 </a>
               </div>
             </div>
+          </div>
+        )}
+        {/* Pool AI Chat Page */}
+        {currentPage === 'pool-ai-chat' && (
+          <div className="min-h-screen">
+            <EnhancedAIWithRewards />
           </div>
         )}
       </main>

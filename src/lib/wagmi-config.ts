@@ -1,106 +1,196 @@
 // src/lib/wagmi-config.ts
 import { defaultWagmiConfig } from '@web3modal/wagmi/react/config'
-import { cookieStorage, createStorage } from 'wagmi'
-import { polygon, polygonAmoy } from 'wagmi/chains'
+import { polygon } from 'wagmi/chains'
 
-// Get projectId from https://cloud.walletconnect.com
-export const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '75f904f6a8fbccdee868ea6b30c4bf7d'
+// Your WalletConnect Project ID
+export const projectId = '75f904f6a8fbccdee868ea6b30c4bf7d'
 
-if (!projectId) throw new Error('Project ID is not defined')
+// Enhanced PromptPool V2 Smart Contract ABI
+const ENHANCED_CONTRACT_ABI = [
+  // ===== EXISTING FUNCTIONS (Backward Compatible) =====
+  {
+    "inputs": [
+      {"internalType": "string", "name": "ipfsHash", "type": "string"},
+      {"internalType": "string", "name": "title", "type": "string"},
+      {"internalType": "string", "name": "category", "type": "string"},
+      {"internalType": "uint256", "name": "promptLength", "type": "uint256"}
+    ],
+    "name": "submitPrompt",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
+    "name": "getUserStats",
+    "outputs": [
+      {"internalType": "uint256", "name": "submissions", "type": "uint256"},
+      {"internalType": "uint256", "name": "totalEarned", "type": "uint256"},
+      {"internalType": "string", "name": "tier", "type": "string"},
+      {"internalType": "bool", "name": "canSubmit", "type": "bool"}
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTotalSubmissions",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getContractBalance",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "uint256", "name": "promptLength", "type": "uint256"},
+      {"internalType": "string", "name": "category", "type": "string"},
+      {"internalType": "address", "name": "user", "type": "address"}
+    ],
+    "name": "getRewardEstimate",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "uint256", "name": "promptId", "type": "uint256"}],
+    "name": "getPrompt",
+    "outputs": [
+      {"internalType": "string", "name": "ipfsHash", "type": "string"},
+      {"internalType": "string", "name": "title", "type": "string"},
+      {"internalType": "string", "name": "category", "type": "string"},
+      {"internalType": "address", "name": "submitter", "type": "address"},
+      {"internalType": "uint256", "name": "timestamp", "type": "uint256"},
+      {"internalType": "uint256", "name": "reward", "type": "uint256"}
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
 
-const metadata = {
-  name: 'PromptPool',
-  description: 'Earn crypto rewards for AI prompt contributions',
-  url: 'https://promptpool.app', // Your domain
-  icons: ['https://promptpool.app/icon.png']
+  // ===== NEW POOL AI CHAT FUNCTIONS =====
+  {
+    "inputs": [
+      {"internalType": "string", "name": "conversationHash", "type": "string"},
+      {"internalType": "uint256", "name": "messageCount", "type": "uint256"},
+      {"internalType": "uint256", "name": "qualityScore", "type": "uint256"},
+      {"internalType": "uint256", "name": "sessionLength", "type": "uint256"},
+      {"internalType": "string", "name": "category", "type": "string"},
+      {"internalType": "bool", "name": "allowTraining", "type": "bool"}
+    ],
+    "name": "submitChatSession",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "claimChatRewards",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
+    "name": "getUserChatStats",
+    "outputs": [
+      {"internalType": "uint256", "name": "totalSessions", "type": "uint256"},
+      {"internalType": "uint256", "name": "totalMessages", "type": "uint256"},
+      {"internalType": "uint256", "name": "averageQuality", "type": "uint256"},
+      {"internalType": "uint256", "name": "pendingRewards", "type": "uint256"}
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+
+  // ===== NEW REFERRAL FUNCTIONS =====
+  {
+    "inputs": [{"internalType": "address", "name": "referrer", "type": "address"}],
+    "name": "setReferrer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "claimReferralRewards",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
+    "name": "getReferralStats",
+    "outputs": [
+      {"internalType": "address", "name": "referrer", "type": "address"},
+      {"internalType": "uint256", "name": "referralCount", "type": "uint256"},
+      {"internalType": "uint256", "name": "totalBonuses", "type": "uint256"},
+      {"internalType": "uint256", "name": "pendingBonuses", "type": "uint256"}
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+
+  // ===== NEW SUBSCRIPTION FUNCTIONS =====
+  {
+    "inputs": [],
+    "name": "paySubscription",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
+    "name": "getSubscriptionStatus",
+    "outputs": [
+      {"internalType": "bool", "name": "isActive", "type": "bool"},
+      {"internalType": "uint256", "name": "nextPayment", "type": "uint256"},
+      {"internalType": "uint256", "name": "monthlyEarnings", "type": "uint256"},
+      {"internalType": "uint256", "name": "requiredPayment", "type": "uint256"}
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+
+  // ===== UTILITY FUNCTIONS =====
+  {
+    "inputs": [],
+    "name": "getContractInfo",
+    "outputs": [{"internalType": "string", "name": "", "type": "string"}],
+    "stateMutability": "pure",
+    "type": "function"
+  }
+] as const
+
+// Enhanced Contract Configuration (Updated)
+export const CONTRACT_CONFIG = {
+  address: '0x8AA7D6a412E744052e857ED4358117D51eA2B1BB' as `0x${string}`,
+  abi: ENHANCED_CONTRACT_ABI,
+  chainId: polygon.id
 }
 
-// Create wagmiConfig with enhanced mobile support
-const chains = [polygon, polygonAmoy] as const
+// Also export as ENHANCED_CONTRACT_CONFIG for compatibility
+export const ENHANCED_CONTRACT_CONFIG = CONTRACT_CONFIG
+
+// Metadata
+const metadata = {
+  name: 'PromptPool',
+  description: 'The World\'s First AI That Pays Users to Chat',
+  url: 'https://promptpool.ai',
+  icons: ['https://avatars.githubusercontent.com/u/37784886']
+}
+
+// Create wagmi config
 export const config = defaultWagmiConfig({
-  chains,
+  chains: [polygon],
   projectId,
   metadata,
-  ssr: true,
-  storage: createStorage({
-    storage: cookieStorage
-  }),
-  // Enhanced mobile wallet options
   enableWalletConnect: true,
   enableInjected: true,
-  enableCoinbase: true,
-  enableEmail: true,
-  // Add social login options for mobile
-  enableSocials: ['google', 'discord', 'github', 'apple'],
-  // Enhanced mobile wallet detection
-  featuredWalletIds: [
-    'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96', // MetaMask
-    'fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa', // Coinbase
-    '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0', // Trust Wallet
-    '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369', // Rainbow
-  ]
+  enableEIP6963: true,
+  enableCoinbase: true
 })
-
-// Your contract configuration
-export const CONTRACT_CONFIG = {
-  address: '0x2D6048916FD4017D9348563d442a3476a710D335' as const,
-  abi: [
-    // ... your existing ABI stays the same
-    {
-      "type": "function",
-      "name": "submitPrompt",
-      "inputs": [
-        {"name": "ipfsHash", "type": "string"},
-        {"name": "title", "type": "string"},
-        {"name": "category", "type": "uint8"},
-        {"name": "promptLength", "type": "uint256"}
-      ],
-      "outputs": [],
-      "stateMutability": "nonpayable"
-    },
-    {
-      "type": "function",
-      "name": "getUserStats",
-      "inputs": [{"name": "user", "type": "address"}],
-      "outputs": [
-        {"name": "", "type": "uint256"},
-        {"name": "", "type": "uint256"},
-        {"name": "", "type": "uint256"},
-        {"name": "", "type": "uint256"},
-        {"name": "", "type": "uint8"},
-        {"name": "", "type": "uint256"},
-        {"name": "", "type": "uint256"}
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "getTotalSubmissions",
-      "inputs": [],
-      "outputs": [{"name": "", "type": "uint256"}],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "getContractBalance",
-      "inputs": [],
-      "outputs": [{"name": "", "type": "uint256"}],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "getRewardEstimate",
-      "inputs": [
-        {"name": "promptLength", "type": "uint256"},
-        {"name": "category", "type": "uint8"},
-        {"name": "user", "type": "address"}
-      ],
-      "outputs": [
-        {"name": "tier", "type": "uint8"},
-        {"name": "rewardAmount", "type": "uint256"}
-      ],
-      "stateMutability": "view"
-    }
-  ] as const,
-  chainId: polygon.id
-} as const

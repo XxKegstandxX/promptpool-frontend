@@ -16,6 +16,7 @@
     "@web3modal/siwe": "^5.1.11",
     "@web3modal/wagmi": "^5.1.11",
     "ethers": "^6.15.0",
+    "lucide-react": "^0.525.0",
     "next": "15.3.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

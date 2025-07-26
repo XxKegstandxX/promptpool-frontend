@@ -3,6 +3,8 @@ import { useAccount, useReadContract, useWriteContract, useWaitForTransactionRec
 import { CONTRACT_CONFIG } from '../lib/wagmi-config'
 import { useState, useEffect } from 'react'
 import { formatEther } from 'viem'
+import { readContract } from '@wagmi/core'
+import { config as wagmiConfig } from '../lib/wagmi-config'
 
 // Hook for reading user stats
 export function useUserStats(address?: `0x${string}`) {
@@ -24,7 +26,7 @@ export function useUserStats(address?: `0x${string}`) {
     reputationScore: result.data[3].toString(),
     currentTier: result.data[4],
     lastSubmissionTime: result.data[5],
-    consecutiveApprovals: result.data[6].toString()
+    consecutiveApprovals: result.data[6] ? result.data[6].toString() : '0'
   } : null
 
   return {
@@ -191,4 +193,68 @@ export function useTierInfo() {
     getTierColor,
     getTierEmoji
   }
+}
+// Add this new hook to fetch user's recent submissions
+export function useUserSubmissions(address: string | undefined) {
+  const { data: totalSubmissions } = useTotalSubmissions()
+  const [userSubmissions, setUserSubmissions] = useState<any[]>([])
+
+  useEffect(() => {
+    if (!address || !totalSubmissions) {
+      console.log('🔍 useUserSubmissions: Missing data', { address, totalSubmissions: totalSubmissions?.toString() })
+      return
+    }
+
+    const fetchUserSubmissions = async () => {
+      console.log('🔍 Starting fetchUserSubmissions for address:', address)
+      const submissions = []
+      const total = parseInt(totalSubmissions.toString())
+      console.log('🔍 Total submissions in contract:', total)
+      
+      // Check last 50 submissions for user's prompts (adjust as needed)
+      const startIndex = Math.max(0, total - 50)
+      console.log(`🔍 Checking submissions from ${startIndex} to ${total - 1}`)
+      
+      for (let i = startIndex; i < total; i++) {
+        try {
+          console.log(`🔍 Reading prompt ${i}...`)
+          const prompt = await readContract(wagmiConfig, {
+            ...CONTRACT_CONFIG,
+            functionName: 'getPrompt',
+            args: [BigInt(i)]
+          })
+          
+          console.log(`🔍 Prompt ${i} data:`, {
+            contributor: prompt[0],
+            title: prompt[2],
+            yourAddress: address,
+            match: prompt[0].toLowerCase() === address.toLowerCase()
+          })
+          
+          if (prompt[0].toLowerCase() === address.toLowerCase()) {
+            console.log(`✅ Found matching submission at index ${i}!`)
+            submissions.push({
+              id: i.toString(),
+              title: prompt[2], // title
+              ipfsHash: prompt[1], // ipfsHash  
+              category: prompt[3], // category
+              tier: prompt[4], // tier
+              reward: formatEther(prompt[5]), // rewardAmount
+              submittedAt: parseInt(prompt[6].toString()) * 1000, // submittedAt
+              status: prompt[7] ? 'approved' : 'pending' // isApproved
+            })
+          }
+        } catch (error) {
+          console.log(`❌ Error reading prompt ${i}:`, error)
+        }
+      }
+      
+      console.log('🔍 Final submissions found:', submissions.length)
+      setUserSubmissions(submissions.reverse()) // Most recent first
+    }
+
+    fetchUserSubmissions()
+  }, [address, totalSubmissions])
+
+  return { userSubmissions }
 }
