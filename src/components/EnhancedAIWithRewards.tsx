@@ -1,3 +1,6 @@
+'use client'
+
+// ... rest of your component code
 import React, { useState, useEffect, useRef } from 'react';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { Send, DollarSign, TrendingUp, Clock, Users, Gift, Zap } from 'lucide-react';
